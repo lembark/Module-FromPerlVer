@@ -999,6 +999,14 @@ Definition of "PREOP" which can be included with the
 Makefile.PL to tarball .git into a stock path included
 into your MANIFEST.
 
+=item Github
+
+The source for this module is maintinaed on Github at:
+
+    git@github.com:lembark/Module-FromPerlVer.git
+
+Suggestions welcome.
+
 =back
 
 =head1 LICENSE

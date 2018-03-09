@@ -1,0 +1,112 @@
+-   v0.4.2 Thu Mar  8 15:53:35 CST 2018
+
+    Modify git tests to be language-agnostic 
+    (hack regex rather than try to set the LC to 
+    C so that folks can read the test results).
+
+-   v0.4.1 Thu Mar  8 15:00:08 CST 2018
+
+    Cleaned up packaging in the git tests.
+    
+    Non-URL git tests should now be portable.
+
+    Still figuring out reliable way to test the URL handling
+    (e.g., without a network). Any fix I can think of won't
+    be portable to Windows due to lack of filesystem sockets.
+
+-   v0.4.0
+
+    Allows defining arguments for tball & url, takes first one
+    that works. 
+
+    POD for PREOP in Makefile.PL for auto-generating repo tarball.
+
+    Git still needs testing, especially on Windows.
+
+    Interface shouldn't change much at this point, main issue will
+    be making the url-clone approach work and validating all of
+    the ways that tarballs can fail.
+
+-   v0.3.1  
+
+    Test cleanups (mainly botched check for existing git executable).
+
+    Start adding extract git from tarball of .git or url.
+
+-   v0.3.0 Wed Mar  7 21:52:37 CST 2018
+
+    POD & tests for Git, enough hacks on the Git module
+    that it works with the tests (Caveat Emptor).
+
+    Fix bug of $ENV{ PERL_VERSION } not being parsed and
+    numified.
+
+    Minor clenaups.
+
+    Make consistent use of extractor's "value" method
+    rater than looking directly into the hash.
+
+    Extract::value rejects false keys (used to be only
+    undefined).
+
+    Bump the module versions up a notch to 0.1.0 since
+    the tests pass and it all seems to do something 
+    at this point.
+
+-   v0.2.0 Tue Mar  6 19:18:15 CST 2018
+
+    POD
+
+    Bump version.
+
+-   v0.1.0 Tue Mar  6 12:38:07 CST 2018
+
+    Passes all Dir tests on all platforms, bump up version.
+
+    POD.
+
+-   v0.0.7 Mon Mar  5 23:06:03 CST 2018
+
+    Correct error in Makefile.PL.
+
+    Added tests.
+
+-   v0.0.6
+
+    POD cleanups.
+
+    Copy message "files" => "files/dirs" to avoid confusion with
+    list of files displayed.
+
+-   v0.0.5
+
+    Remove FindBin::libs from Makefile.PL.
+
+-   v0.0.4 Sat Mar  3 22:51:10 CST 2018
+
+    Modify tests, separate require from calling import.
+
+    Report version of module loaded via require to isolate
+    which version is not parsable by 5.8.
+
+-   v0.0.3 Fri Mar  2 14:19:47 CST 2018
+
+    Makefile.PL, add missing dependencies.
+
+-   v0.0.2 Thu Mar  1 13:45:34 CST 2018
+
+    Add handling for Git, split low-level functions
+    for acquiring data into Dir and Git classes. 
+
+    Utility functions have a few changed names to make
+    them consistent with switching between subdir and 
+    git tags.
+
+    Git is largely untested.
+
+    Added tests & sanity checks.
+
+-   v0.0.1  Sun Feb 18 14:19:59 CST 2018
+
+    Initial kwikhak... ah... er... "relase", yes,
+    that's the word: release.

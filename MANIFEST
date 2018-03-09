@@ -1,0 +1,33 @@
+MANIFEST
+README
+CHANGES
+Makefile.PL
+lib/Module/FromPerlVer.pm
+lib/Module/FromPerlVer/Git.pm
+lib/Module/FromPerlVer/Dir.pm
+lib/Module/FromPerlVer/Extract.pm
+
+t/00-usable.t
+t/01-default-args.t
+t/10-dir-defaults-no_copy.t
+t/11-use_dir.t
+t/12-dir-default-use.t
+t/20-git-defaults-5.5.3.t
+t/21-git-defaults-5.888.888.t
+t/22-git-defaults-5.999.999.t
+t/23-git-defaults-5.888.999.t
+t/sandbox/.git.tar 
+
+# fake version directory
+# used for testing Dir.pm
+
+t/version/5.005003/lib/Foo.pm
+t/version/5.005003/pod/Foo.pod
+t/version/5.005003/etc/version.dat
+t/version/5.888_888/lib/Foo.pm
+t/version/5.888_888/pod/Foo.pod
+t/version/5.888_888/etc/version.dat
+t/version/5.999_999/lib/Foo.pm
+t/version/5.999_999/pod/Foo.pod
+t/version/5.999_999/etc/version.dat
+

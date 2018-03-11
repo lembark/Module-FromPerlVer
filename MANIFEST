@@ -7,27 +7,49 @@ lib/Module/FromPerlVer/Git.pm
 lib/Module/FromPerlVer/Dir.pm
 lib/Module/FromPerlVer/Extract.pm
 
+# leave .git.tar here even if it is not in 
+# the sandbox directory, it will be produced via
+# PREOP in Makefile.PL.
+
+t/sandbox/.git.tar
+
+# test files via:
+# rm -f t/sandbox/*;
+# find t -type f -o -type l | grep -v '/.git/' | sort -d;
+
 t/00-usable.t
 t/01-default-args.t
 t/10-dir-defaults-no_copy.t
 t/11-use_dir.t
 t/12-dir-default-use.t
-t/20-git-defaults-5.5.3.t
-t/21-git-defaults-5.888.888.t
-t/22-git-defaults-5.999.999.t
-t/23-git-defaults-5.888.999.t
-t/sandbox/.git.tar 
-
-# fake version directory
-# used for testing Dir.pm
-
+t/20-git-defaults-v5.5.3.t
+t/20-git-defaults-v5.888.888.t
+t/20-git-defaults-v5.999.999.t
+t/21-git-defaults-v5.005_003.t
+t/21-git-defaults-v5.888_888.t
+t/21-git-defaults-v5.999_999.t
+t/22-git-defaults-v5.005003.t
+t/22-git-defaults-v5.888888.t
+t/22-git-defaults-v5.999999.t
+t/23-git-defaults-5.005_003.t
+t/23-git-defaults-5.888_888.t
+t/23-git-defaults-5.999_999.t
+t/24-git-defaults-5.005003.t
+t/24-git-defaults-5.888888.t
+t/24-git-defaults-5.999999.t
+t/25-git-defaults-5.005003.t
+t/25-git-defaults-5.888888.t
+t/25-git-defaults-5.999999.t
+t/bin/20-git-defaults_t
+t/bin/make-sandbox
+t/sandbox/.gitignore
+t/version/5.005003/etc/version.dat
 t/version/5.005003/lib/Foo.pm
 t/version/5.005003/pod/Foo.pod
-t/version/5.005003/etc/version.dat
+t/version/5.888_888/etc/version.dat
 t/version/5.888_888/lib/Foo.pm
 t/version/5.888_888/pod/Foo.pod
-t/version/5.888_888/etc/version.dat
+t/version/5.999_999/etc/version.dat
 t/version/5.999_999/lib/Foo.pm
 t/version/5.999_999/pod/Foo.pod
-t/version/5.999_999/etc/version.dat
 

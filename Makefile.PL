@@ -6,7 +6,7 @@ use version;
 use ExtUtils::MakeMaker;
 
 my $path    = 'lib/Module/FromPerlVer.pm';
-my $version = '0.4.2'; 
+my $version = '0.4.3'; 
 
 WriteMakefile
 (
@@ -22,7 +22,6 @@ WriteMakefile
 
 		qw
         (
-
             Archive::Tar            0
             Carp                    0
             Cwd                     0
@@ -38,9 +37,7 @@ WriteMakefile
             parent                  0
             strict                  0
             version                 0
-
         ),
-
     },
 
     dist =>
@@ -50,7 +47,7 @@ WriteMakefile
         # telling people how to make a tarball.
 
         PREOP =>
-        q{ cd t/sandbox/ && /bin/tar cvf .git.tar .git },
+        q{ ( cd t/sandbox/ && /bin/tar cf .git.tar .git ); },
 
     },
 );

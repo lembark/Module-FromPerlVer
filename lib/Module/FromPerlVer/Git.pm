@@ -30,9 +30,9 @@ my $nil         = sub{};
 # now is ignoring the issue, letting the path do its work, and
 # leaving 'git' without an absolute path.
 
-my @checkout    = qw( git checkout                      );
-my @clone       = qw( git clone     --no-checkout       );
-my @restore     = qw( git checkout  --theirs            );
+my @checkout    = qw( git checkout  --force --overwrite-ignore  );
+my @clone       = qw( git clone     --no-checkout               );
+my @restore     = qw( git checkout  --theirs                    );
 
 ########################################################################
 # utility subs

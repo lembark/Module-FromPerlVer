@@ -20,15 +20,17 @@ do
         find . | cpio -pdv ~-;
     );
 
+    echo -e "$i\n$(ls -al)";
+   
     git add *;
-    git tag "perl/$(basename $i)";
     git commit -m"$i";
+    git tag -a "perl/$(basename $i)" -m"$i";
+    git commit -m"tag $i";
 
     rm -rf *;
-
 done
 
-tar cvf .git.tar .git;
+tar cf .git.tar .git;
 
 # push fake sandbox into module's git.
 # .gitignore avoids issues with

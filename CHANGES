@@ -1,3 +1,15 @@
+-   v0.4.3 Sun Mar 11 14:08:02 CDT 2018
+
+    Added tests, shell script to generate minimal
+    sandbox test directory (extracted as necessary
+    via 0-usable.t). this needs to be re-run if 
+    there are changes to the ./version directory.
+
+    Added shell snippets to acquire usable test list
+    into MANIFEST. The trick here is grabbing all of
+    ./t other than the stub .git directory and including
+    the ./t/sandbox/.git.tar file.
+
 -   v0.4.2 Thu Mar  8 15:53:35 CST 2018
 
     Modify git tests to be language-agnostic 

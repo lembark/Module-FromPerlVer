@@ -1,0 +1,32 @@
+#!/bin/bash -vx
+
+cd "$(dirname $0)/..";
+
+rm -rf sandbox;
+mkdir  sandbox;
+
+cd ./sandbox;
+
+git init .;
+
+echo '.git' > .gitignore;
+git add .;
+git commit -m'.gitignore';
+
+for i in ../version/*; 
+do
+    (
+        cd $i;
+        find . | cpio -pdv ~-;
+    );
+
+    git add *;
+    git tag "perl/$(basename $i)";
+    git commit -m"$i";
+
+    rm -rf *;
+
+done
+
+exit 0;
+

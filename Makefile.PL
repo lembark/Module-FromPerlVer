@@ -42,13 +42,20 @@ WriteMakefile
 
     dist =>
     {
-        # the local_repo.tar is *not* in the MANIFEST.
-        # it is used here for validating the POD
-        # telling people how to make a tarball.
+        # generate .git.tar for the manifest
+        # here. this will contain only the .git
+        # directory for the test sandbox.
+        #
+        # see also t/bin/make-sandbox
 
-        PREOP =>
-        q{ ( cd t/sandbox/ && /bin/tar cf .git.tar .git ); },
-
+        PREOP => <<'END',
+(
+    cd ./t                  &&
+    bin/make-sandbox        &&
+    cd ./sandbox/           &&
+    tar cvf .git.tar .git   ;
+);
+END
     },
 );
 

@@ -23,7 +23,9 @@ for my $madness
     ok $madness->can( 'VERSION' ), "$madness can 'VERSION'"
     or BAIL_OUT "$madness cannot 'VERSION'", 1;
 
-    ok $madness->VERSION, "$madness has a VERSION";
+    ok my $v = $madness->VERSION, "$madness has a VERSION";
+
+    note "Found version: '$v'";
 }
 
 my $dir     = 't/sandbox';

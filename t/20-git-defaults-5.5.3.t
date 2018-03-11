@@ -19,7 +19,7 @@ SKIP:
 
     note "git version: '$git'";
 
-    like $git, qr{^ git }x
+    like $git, qr{^ git }x, "Git version: '$git'"
     or skip 'Failed running git.', 1;
 
     chdir $sandbox

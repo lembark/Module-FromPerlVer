@@ -1,4 +1,4 @@
-#!/bin/bash -vx
+#!/bin/bash
 
 cd "$(dirname $0)/..";
 
@@ -27,6 +27,16 @@ do
     rm -rf *;
 
 done
+
+tar cvf .git.tar .git;
+
+# push fake sandbox into module's git.
+# .gitignore avoids issues with
+# submodule.
+
+cd ..;
+git add sandbox;
+git commit -m'minimal sandbox for t/2*';
 
 exit 0;
 

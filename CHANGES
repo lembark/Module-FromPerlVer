@@ -1,3 +1,8 @@
+-   v0.4.4 Mon Mar 12 10:14:04 CDT 2018
+
+    Fix botched path in usability for extracting the 
+    sandbox .git.
+
 -   v0.4.3 Sun Mar 11 14:08:02 CDT 2018
 
     Added tests, shell script to generate minimal

@@ -2,6 +2,7 @@ use 5.006;
 
 use Test::More;
 use Archive::Tar;
+use File::Basename  qw( basename );
 
 for my $madness
 (
@@ -23,38 +24,69 @@ for my $madness
     ok $madness->can( 'VERSION' ), "$madness can 'VERSION'"
     or BAIL_OUT "$madness cannot 'VERSION'", 1;
 
-    ok my $v = $madness->VERSION, "$madness has a VERSION";
+    my $ver = $madness->VERSION;
 
-    note "Found version: '$v'";
+    ok $ver, "$madness has VERSION '$ver'";
+}
+
+for( qx{git --version} )
+{
+    if( my $status = $? )
+    {
+        fail "git --version returns $?, git tests will be skipped.";
+    }
+    else
+    {
+        chomp;
+
+        pass "Git version: '$_'";
+    }
 }
 
 my $dir     = 't/sandbox';
-my $base    = '.git.tar';
-my $path    = "$dir/$base";
+my $git_d   = "$dir/.git";
+my $tball   = "$git_d.tar";
 
-if( -e "$dir/.git" )
+-d $dir
+or BAIL_OUT "Bogus release: missing '$dir'";
+
+$ENV{ TEST_EXTRACT }
+and system "rm -rf $git_d";
+
+if( -d $git_d )
 {
-    note 'Sandbox ready, Git tests are runable.';
+    pass "Existing sandbox: '$dir'";
 }
-elsif( -e $path )
+elsif( -e $tball )
 {
-    diag "Recover '$path' for Git.pm tests.";
+    diag "Recover $dir/.git using '$tball'.";
 
     my $tar = Archive::Tar->new;
 
+$DB::single = 1;
+
     eval
     {
+        my $base    = 
+
         chdir $dir
         or die "Failed chdir: '$dir', $!.\n";
             
-        $tar->extract_archive( $base )
+        $tar->extract_archive( basename $tball )
         or die 'Failed extract: ' . $tar->error;
+
+        note "Extracted $tball -> $git_d";
+        
+        1
     }
-    or diag "Failed extract: Git.pm tests will be skipped\n$@";
+    ? pass "Prepared sandbox: '$git_d'"
+    : fail "Failed extract: Git.pm tests will be skipped\n$@"
+    ;
 }
 else
 {
-    diag "Git.pm tests will skip: missing '$base' and '$dir/.git'";
+    fail "Missing sandbox: $git_d";
+    diag "Git.pm tests will skip: missing '$git_d' and '$tball'.";
 }
 
 done_testing;

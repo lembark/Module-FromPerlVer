@@ -13,7 +13,7 @@ WriteMakefile
     NAME            => 'Module::FromPerlVer',
     ABSTRACT_FROM   => $path,
     VERSION         => version->parse( $version )->numify,
-	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
+    AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
     LICENSE         => 'perl',
     PREREQ_PM       =>
     {

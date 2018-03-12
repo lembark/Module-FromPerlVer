@@ -7,40 +7,22 @@ lib/Module/FromPerlVer/Git.pm
 lib/Module/FromPerlVer/Dir.pm
 lib/Module/FromPerlVer/Extract.pm
 
-# leave .git.tar here even if it is not in 
-# the sandbox directory, it will be produced via
-# PREOP in Makefile.PL.
-
-# test files via:
+# no reason to copy the symlinks, usable runs make-tests
+# to ensure they are available.
+# generate list via:
+#
 # rm -f t/sandbox/*;
-# find t -type f -o -type l | grep -v '/.git/' | grep -v '/.gitignore' sort -d;
+# find t -type f | grep -v '/.git/' | grep -v '/.gitignore' | sort -d;
 
 t/00-usable.t
 t/01-default-args.t
 t/10-dir-defaults-no_copy.t
 t/11-use_dir.t
 t/12-dir-default-use.t
-t/20-git-defaults-5.005003.t
-t/20-git-defaults-5.005_003.t
-t/20-git-defaults-5.5.3.t
-t/20-git-defaults-5.888888.t
-t/20-git-defaults-5.888_888.t
-t/20-git-defaults-5.8.8.t
-t/20-git-defaults-5.999999.t
-t/20-git-defaults-5.999_999.t
-t/20-git-defaults-5.9.9.t
-t/20-git-defaults-v5.005003.t
-t/20-git-defaults-v5.005_003.t
-t/20-git-defaults-v5.5.3.t
-t/20-git-defaults-v5.888888.t
-t/20-git-defaults-v5.888_888.t
-t/20-git-defaults-v5.8.8.t
-t/20-git-defaults-v5.999999.t
-t/20-git-defaults-v5.999_999.t
-t/20-git-defaults-v5.9.9.t
-t/bin/20-git-defaults_t
-t/bin/make-20-tests
-t/bin/make-sandbox
+t/bin/20-file-defaults_t
+t/bin/21-git-local-defaults_t
+t/bin/31-file-version-from_t
+t/bin/31-git-local-version-from_t
 t/sandbox/.git.tar
 t/version/5.005003/etc/version.dat
 t/version/5.005003/lib/Foo.pm
@@ -51,3 +33,4 @@ t/version/5.888_888/pod/Foo.pod
 t/version/5.999_999/etc/version.dat
 t/version/5.999_999/lib/Foo.pm
 t/version/5.999_999/pod/Foo.pod
+

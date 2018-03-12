@@ -15,19 +15,21 @@ use Test::Deep;
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
-use lib "$Bin/../lib";
-
 my $madness = 'Module::FromPerlVer';
-my $sandbox = "$Bin/sandbox";
+my $v_dir   = "$Bin/version";
 
-note "Test sandbox: '$sandbox'";
+note "Test sandbox: '$v_dir'";
 
 SKIP:
 {
     my $base    = basename $0, '.t';
 
     my ( $perl_v )
-    =  $base =~ m{ .* defaults \W+ (.+) }x
+    =  do
+    {
+        my $i   = rindex $base, '-';
+        substr $base, ++$i
+    }
     or 
     skip "Botched test: no perl version in '$base'.", 1;
 
@@ -36,77 +38,42 @@ SKIP:
     version->parse( $perl_v )->numify
     or skip "Botched test: non-parsable '$perl_v' ($base).";
 
-    chomp( my $git = qx( git --version ) );
-
-    note "git version: '$git'";
-
-    like $git, qr{^ git }x, "Git version: '$git'"
-    or skip 'Failed running git.', 1;
-
-    -d $sandbox
-    or skip "Non-existant: '$sandbox'", 1;
-
-    chdir $sandbox
-    or skip "Faild chdir '$sandbox', $!\n", 1;
-    
-    # clean any previous test files.
-    # this leaves the .git.tar, .git.
-
-    system '/bin/rm -rf *';
+    -d $v_dir
+    or skip "Botched test: missing '$v_dir'";
 
     local $ENV{ PERL_VERSION } = $perl_v;
 
-    use_ok $madness => qw( use_git 1 )
+    use_ok $madness => qw( use_dir 1 )
     or BAIL_OUT "$madness is not usable.";
 
-    my $prefix  = $madness->source_prefix;
-
-    is $prefix, 'perl/', "Source prefix: '$found' (perl/)";
-
-    for my $found ( $madness->source_files )
+    for my $prefix ( $madness->source_prefix )
     {
+        my $expect  = './t/version';
+
+        is $prefix, $expect, "Source prefix: '$found' ($expect)";
+    }
+
+    for my $found ( scalar $madness->source_files )
+    {
+        @$found
+        ? pass 'Found source files in version directory'
+        : fail 'Missing source files for cleanup'
+        ;
+
         note "Source files:\n", explain $found;
 
-        fail "Extraneous souce files: $found";
+        ok -e , "Found: '$_'"
+        for @$found;
     }
 
     eval
     {
-$DB::single = 1;
+        $madness->cleanup;
 
-        chomp( my $found = ( qx{ git branch } )[0] );
-
-        ok 0 < index( $found, $prefix ),
-        "Found: '$prefix' in '$found'"
-        or do
-        {
-            die "No prefix: '$prefix' in '$found'.\n";
-        };
-
-        my $v_rx    = qr{ $prefix ([\d._]+) \b }x;
-
-        if
-        (
-            my ( $tag_v ) = $found =~ $v_rx
-        )
-        {
-            pass "Tag version: '$tag_v'";
-
-            my $i   = version->parse( $tag_v  )->numify;
-            my $j   = version->parse( $perl_v )->numify;
-
-            ok $i <= $j, "Tag ($i) <= Perl ($j)";
-        }
-        else
-        {
-            fail "No version: '$v_rx'";
-            diag "Git status: '$found'";
-        }
-        
-
-        1
+        pass "Survived cleanup.";
     }
-    or fail "Unable to determine branch: $@";
+    or 
+    fail "Failed cleanup: $@";
 }
 
 done_testing;

@@ -15,8 +15,6 @@ use Test::Deep;
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
-use lib "$Bin/../lib";
-
 my $madness = 'Module::FromPerlVer';
 my $sandbox = "$Bin/sandbox";
 

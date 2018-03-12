@@ -87,7 +87,7 @@ else
     diag "Git.pm tests will skip: missing '$git_d' and '$tball'.";
 }
 
-for my $output  ( qx{ 't/bin/make-tests' )
+for my $output  ( qx{ 't/bin/make-tests' } )
 {
     $?
     ? fail "Failed generate tests: $output."

@@ -5,7 +5,8 @@
 
 use 5.006;
 
-use File::Basename  qw( basename dirname );
+use File::Basename  qw( basename dirname    );
+use List::MoreUtils qw( zip                 );
 
 ########################################################################
 # package variables
@@ -13,13 +14,48 @@ use File::Basename  qw( basename dirname );
 
 my $dir = ( dirname $0 ) . '/..';
 
-my @versionz
+my @test_verz
 = qw
 (
-    5.005003    5.888888    5.999999
-    5.005_003   5.888_888   5.999_999
-    5.5.3       5.8.8       5.9.9
+    5.5.3
+    5.888.888
+    5.999.999
 );
+
+my @formatz
+= map
+{
+    (   $_, 'v' . $_ )
+}
+qw
+(
+    %d.%d.%d
+    %d.03d.%03d
+    %d.03d%03d
+    %d.03d_%03d
+);
+
+my @v_stringz
+= do
+{
+    map
+    {
+        my @argz    = split '.' => $_;
+
+        map
+        {
+            my $f1  = $_;
+            my $f2  = 'v' . $_;
+
+            (
+                sprintf( $f1 => @argz ),
+                sprintf( $f2 => @argz ),
+            )
+        }
+        @formatz
+    }
+    @versionz;
+};
 
 ########################################################################
 # symlink all of the test templates to version-specific paths.

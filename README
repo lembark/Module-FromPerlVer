@@ -55,5 +55,11 @@ way, the versioning should be straightforward to maintain. The
 biggest hurdle is overcoming muscle-memory to edit files under
 ./lib that are going to be overwritten.
 
+Notes to anyone editing the module:
+
+t/00-usable.t will set up the test environment the first time.
+This symlinks version-specific basenames to all of the bin/*_t
+version-based tests. These tests should not be pushed into the
+repository nor should they be included with the module tarball.
 
  

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+cd $(dirname $0)/..;
+
+path='./bin/20-git-defaults_t';
+base=$(basename $path '_t');
+
+versions=(
+    5.005003
+    5.888888
+    5.999999
+
+    5.005_003
+    5.888_888
+    5.999_999
+
+    5.5.3
+    5.8.8
+    5.9.9
+
+    v5.005003
+    v5.888888
+    v5.999999
+
+    v5.005_003
+    v5.888_888
+    v5.999_999
+
+    v5.5.3
+    v5.8.8
+    v5.9.9
+)
+
+rm 20-*.t;
+
+for i in "${versions[@]}"
+do
+    ln -fsv $path "$base-$i.t";
+done
+
+exit 0;

@@ -63,8 +63,6 @@ elsif( -e $tball )
 
     my $tar = Archive::Tar->new;
 
-$DB::single = 1;
-
     eval
     {
         my $base    = 

@@ -1,0 +1,58 @@
+#!/bin/env  perl
+########################################################################
+# housekeeping
+########################################################################
+
+use 5.006;
+
+use File::Basename  qw( basename dirname );
+
+########################################################################
+# package variables
+########################################################################
+
+my $dir = ( dirname $0 ) . '/..';
+
+my @versionz
+= qw
+(
+    5.005003    5.888888    5.999999
+    5.005_003   5.888_888   5.999_999
+    5.5.3       5.8.8       5.9.9
+);
+
+########################################################################
+# symlink all of the test templates to version-specific paths.
+########################################################################
+
+chdir $dir
+or die "Failed chdir: $dir, $!";
+
+for my $path ( glob "bin/*_t" )
+{
+    print "# Link: '$path'\n";
+    
+    my $base    = basename $path => '_t';
+    my $pref    
+    = do
+    {
+        my $i   = index $base, '-';
+        substr $base, 0, $i;
+    };
+
+    print "# Cleanup: '$pref-*'\n";
+
+    unlink glob $pref . '-*';
+
+    symlink $path => $_
+    for map
+    {
+        (
+            "$base-$_.t"  ,
+            "$base-v$_.t" ,
+        )
+    }
+    @versionz;
+}
+
+exit 0;

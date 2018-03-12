@@ -87,5 +87,12 @@ else
     diag "Git.pm tests will skip: missing '$git_d' and '$tball'.";
 }
 
+for my $output  ( qx{ 't/bin/make-tests' )
+{
+    $?
+    ? fail "Failed generate tests: $output."
+    : pass 'Dynamic tests generated.'
+}
+
 done_testing;
 __END__

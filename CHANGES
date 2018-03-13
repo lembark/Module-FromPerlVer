@@ -1,3 +1,15 @@
+-   v0.5.0 Tue Mar 13 18:24:57 CDT 2018
+
+    Working version_from handler.
+
+    Kwikhaks to generate version directory for a variety of
+    version formats (make-version-dir) and recover the sandbox
+    (make-sandbox-dir).
+
+    Generator for dynamic tests based on version dir's (make-tests).
+
+    The t/bin/make-* files are called from Makefile.PL.
+
 -   v0.4.4 Mon Mar 12 10:14:04 CDT 2018
 
     Fix botched path in usability for extracting the 

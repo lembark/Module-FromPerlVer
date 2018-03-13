@@ -5,6 +5,9 @@
 #   "20-bar-5.005_003"
 #   "20-bar-v5.005003"
 # will test varieties of the same perl version string.
+########################################################################
+# housekeeping
+########################################################################
 
 use 5.006;
 use version;
@@ -15,12 +18,20 @@ use Test::Deep;
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
+########################################################################
+# package variables 
+########################################################################
+
 my $madness = 'Module::FromPerlVer';
 my $v_dir   = "$Bin/version";
 my $v_file  = 'perl_verison';
-my @argz    = ( qw( use_dir 1 version_from ), $v_file );
+my @argz    = qw( use_dir 1 version_from ), $v_file;
 
 note "Test sandbox: '$v_dir'";
+
+########################################################################
+# test reading version from "use" or "no".
+########################################################################
 
 delete $ENV{ PERL_VERSION };
 
@@ -45,14 +56,12 @@ SKIP:
     -d $v_dir
     or skip "Botched test: missing '$v_dir'";
 
-    if( open my $fh, '>', $v_file )
+    for ( $v_file )
     {
-        print $fh "use $perl_v;\n";
-        close $fh;
-    }
-    else
-    {
-        skip "Failed open: '$v_file' $!", 1;
+        open my $fh, '>', $_
+        or skip "Failed opening: '$_'";
+
+        print $fh, $perl_v;
     }
 
     require_ok $madness;

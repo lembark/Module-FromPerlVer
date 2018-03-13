@@ -57,9 +57,6 @@ biggest hurdle is overcoming muscle-memory to edit files under
 
 Notes to anyone editing the module:
 
-t/00-usable.t will set up the test environment the first time.
-This symlinks version-specific basenames to all of the bin/*_t
-version-based tests. These tests should not be pushed into the
-repository nor should they be included with the module tarball.
-
+t/bin/make-*-dir & t/bin/make-tests will set up the test environment 
+the first time. These are called from Makefile.PL.
  

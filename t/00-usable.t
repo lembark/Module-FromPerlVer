@@ -43,6 +43,16 @@ for( qx{git --version} )
     }
 }
 
+$ENV{ TEST_EXTRACT }
+and system "rm -rf ./t/version";
+
+for( system qw( /bin/env perl t/bin/make-version-dir ) )
+{
+    my $err = $!;
+
+    ok ! $err, "make-verison-dir exits: $err";
+}
+
 my $dir     = 't/sandbox';
 my $git_d   = "$dir/.git";
 my $tball   = "$git_d.tar";

@@ -143,14 +143,14 @@ my $extract_perl_v
     my $extract = shift;
     my $perl_v  = '';
 
-    if( $perl_v = $extract->value( 'perl_version' ) )
+    if( my $v = $extract->value( 'perl_version' ) )
     {
         eval
         {
-            $perl_v = version->parse( $perl_v )->numify
+            $perl_v = version->parse( $v )->numify
         }
         or 
-        die "Unparsable perl version: '$perl_v'\n"
+        die "Unparsable perl version: '$v'\n"
     }
     elsif( my $path = $extract->value( 'version_from' ) )
     {
@@ -165,13 +165,12 @@ my $extract_perl_v
         or
         die "Botched version_from: open '$path', $!\n";
 
-        $perl_v
-        = first
+        first
         {
             if
             (
                 my ( $min_v )
-                = m{ \buse \s+ (v? 5[.] +?) \s* ; }
+                = m{ \buse \s+ (v? 5[.].+?) ; }x
             )
             {
                 $perl_v 
@@ -182,7 +181,7 @@ my $extract_perl_v
             elsif
             (
                 my ( $max_v ) 
-                = m{ \bno  \s+ (v? 5[.] +?) \s* ; }
+                = m{ \bno  \s+ (v? 5[.].+? ;) }x
             )
             {
                 $perl_v

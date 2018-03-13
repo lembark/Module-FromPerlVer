@@ -17,7 +17,7 @@ for @$filz;
 
 my $count   = $madness->get_files;
 
-ok 7 == $count, "Get files returns $count (7)";
+ok 10 == $count, "Get files returns $count (10)";
 
 ok -e , "Installed: '$_'"
 for @$filz;

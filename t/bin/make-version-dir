@@ -1,0 +1,217 @@
+#!/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+
+use 5.6.0;
+use strict;
+
+use version;
+
+use Cwd                 qw( getcwd          );
+use FindBin             qw( $Bin            );
+use File::Basename      qw( dirname         );
+use List::Util          qw( pairmap uniq    );
+use List::MoreUtils     qw( zip             );
+
+use File::Spec::Functions
+qw
+(
+    &catpath
+    &catdir
+);
+
+########################################################################
+# package variables
+########################################################################
+
+$\    = "\n";
+
+my $verbose = $ENV{ VERBOSE } || '';
+
+my $v_root  = 'version';
+
+my @v_stringz
+= do
+{
+    my @versionz 
+    = qw
+    (
+        5.0.1
+        5.6.0
+        5.8.8
+        5.888.888
+        5.999.999
+    );
+
+    my @formatz
+    = qw
+    (
+        %d.%d.%d
+        %d.%03d%03d
+        %d.%03d.%03d
+        %d.%03d_%03d
+    );
+
+    # lexical sort works.
+
+    uniq
+    sort
+    map
+    {
+        (
+            $_, "v$_"
+        )
+    }
+    pairmap
+    {
+        sprintf $a => @$b
+    }
+    map
+    {
+        my @v   = ( [ split /\W/ ] ) x @formatz;
+
+        zip @formatz, @v
+    }
+    @versionz;
+};
+
+my @mod_specz = 
+(
+    [ qw( Foo   use ) ],
+    [ qw( Bar   no  ) ],
+);
+
+my @file_specz =
+(
+    [
+        qw( lib pm ),
+        <<'END',
+package %s;
+our VERSION='1.234567';
+%s %s;
+1
+__END__
+END
+    ],
+    [
+        qw( pod pod ),
+        <<'END',
+=head NAME
+
+%s - Module for testing %s %s
+END
+    ],
+    [
+        # easier to parse use for validatio of
+        # the module parser.
+
+        qw( etc dat ),
+        <<'END',
+%s %s;
+END
+    ],
+);
+
+########################################################################
+# utility subs
+########################################################################
+
+sub mkdir_if
+{
+    my $path = catdir @_;
+
+    -d $path
+    or
+    mkdir $path, 0777
+    or 
+    die "Failed mkdir: '$path', $!\n";
+
+    $path
+}
+
+sub open_path
+{
+    my $path    = catpath '' => @_;
+
+    open my $fh, '>', $path
+    or 
+    die "Failed open: '$path', $!\n";
+
+    $fh
+}
+
+sub make_v_file
+{
+    my ( $ver, $dir, $base, $name, $use, $format ) = @_;
+
+    my $fh  = open_path $dir => $base;
+
+    # normally disk-full issues won't show up until 
+    # the close can't flush the buffer; need to check 
+    # both.
+    #
+    # note: lack of separator between $fh & $mod_fmt.
+
+    my $text    = sprintf $format => $name, $use, $ver;
+
+    print $fh $text
+    or die "Failed print: '$base', $!\n";
+
+    close $fh
+    or die "Failed close: '$base', $!\n";
+}
+
+########################################################################
+# generate a directory for each version with Foo.pm using the
+# version and Bar.pm having "no" version, etc/version.dat having
+# the version for comparision.
+
+# i.e., start in ./t
+
+chdir dirname $Bin
+or die "Failed chdir: $!";
+
+mkdir_if $v_root;
+
+print '# Working directory: ' . getcwd;
+
+for my $v_string ( @v_stringz )
+{
+    eval
+    {
+        my $v_dir   = mkdir_if $v_root => $v_string;
+
+        print "# Version dir: '$v_dir'"
+        if $verbose;
+
+        for( @file_specz )
+        {
+            my ( $sub, $ext, $format ) = @$_;
+
+            my $v_sub   = mkdir_if $v_dir, $sub;
+
+            print "# Subdir: '$v_sub'"
+            if $verbose;
+
+            for( @mod_specz )
+            {
+                my( $name, $use ) = @$_;
+
+                my $base    = "$name.$ext";
+
+                print "# Generate: '$base'"
+                if $verbose;
+
+                make_v_file $v_string, $v_sub, $base, $name, $use, $format;
+            }
+        }
+
+        1
+    }
+    or warn;
+}
+
+# this is not a module
+0
+__END__

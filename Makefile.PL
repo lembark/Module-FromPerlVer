@@ -1,3 +1,6 @@
+########################################################################
+# housekeeping
+########################################################################
 
 use 5.006;
 use strict;
@@ -5,8 +8,39 @@ use version;
 
 use ExtUtils::MakeMaker;
 
+########################################################################
+# package variables
+########################################################################
+
 my $path    = 'lib/Module/FromPerlVer.pm';
 my $version = '0.4.4'; 
+
+########################################################################
+# set up sandbox & version directory, generate dynamic tests
+########################################################################
+
+$ENV{ TEST_EXTRACT }
+and do
+{
+    system "rm -rf ./t/version t/sandbox/.git";
+    my $err = $?;
+    
+    print "Failed rm: '$err' (TEST_EXTRACT)"
+    if $err;
+};
+
+for my $base ( qw( make-version-dir make-sandbox-dir make-tests ) )
+{
+    my $path    = "t/bin/$base";
+
+    print "Setup: '$path'";
+
+    system "/bin/env perl $path";
+    my $err = $!;
+
+    print "$path fails: $err"
+    if $err;
+}
 
 WriteMakefile
 (
@@ -51,7 +85,11 @@ WriteMakefile
 
         PREOP =>
         q{ cd t/sandbox/ && /bin/tar cvf .git.tar .git },
+    },
 
+    test =>
+    {
+        TESTS => 't/*.t t/*/*.t'
     },
 );
 

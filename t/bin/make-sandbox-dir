@@ -1,0 +1,54 @@
+#!/bin/env perl
+
+use File::Basename;
+
+my $sand_d  = "t/sandbox";
+my $git_d   = "$sand_d/.git";
+my $tball   = "$git_d.tar";
+
+for( qx{git --version} )
+{
+    if( my $status = $? )
+    {
+        print "git --version returns $?, git tests will be skipped.\n";
+    }
+    else
+    {
+        print "Git version: '$_'";
+    }
+}
+
+if( -d $git_d )
+{
+    print "Existing: '$git_d'\n";
+}
+elsif( -e $tball )
+{
+    print "Recover $git_d using '$tball'.\n";
+
+    my $tar = Archive::Tar->new;
+
+    eval
+    {
+        chdir $sand_d
+        or die "Failed chdir: '$sand_d', $!.\n";
+            
+        $tar->extract_archive( basename $tball )
+        or die 'Failed extract: ' . $tar->error;
+
+        print "Extracted $tball -> $git_d\n";
+        
+        1
+    }
+    ? print "Prepared sandbox: '$git_d'\n"
+    : print "Failed extract: Git.pm tests will be skipped\n$@\n"
+    ;
+}
+else
+{
+    print "Missing sandbox: $git_d\n";
+    print "Git.pm tests will skip: missing '$git_d' and '$tball'.\n";
+}
+
+0
+__END__

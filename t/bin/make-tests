@@ -15,6 +15,7 @@ use List::Util      qw( pairs pairmap       );
 ########################################################################
 
 my $dir = ( dirname $0 ) . '/..';
+my $dyn = "$dir/dynamic";
 
 my @v_stringz
 = do
@@ -61,10 +62,10 @@ my @v_stringz
 # symlink all of the test templates to version-specific paths.
 ########################################################################
 
-chdir $dir
+chdir $dyn
 or die "Failed chdir: $dir, $!";
 
-for my $path ( glob "bin/*_t" )
+for my $path ( glob "../bin/*_t" )
 {
     print "# Link: '$path'\n";
     
@@ -77,6 +78,8 @@ for my $path ( glob "bin/*_t" )
     };
 
     print "# Cleanup: '$pref-*'\n";
+
+    unlink "$pref-*.t";
 
     symlink $path => "$base-$_.t"
     for @v_stringz;

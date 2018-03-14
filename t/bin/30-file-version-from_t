@@ -10,10 +10,13 @@
 ########################################################################
 
 use 5.006;
+use strict;
 use version;
 
 use Test::More;
 use Test::Deep;
+
+use File::Temp      qw( tempfile    );
 
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
@@ -23,11 +26,6 @@ use FindBin         qw( $Bin        );
 ########################################################################
 
 my $madness = 'Module::FromPerlVer';
-my $v_dir   = "$Bin/version";
-my $v_file  = 'perl_verison';
-my @argz    = qw( use_dir 1 version_from ), $v_file;
-
-note "Test sandbox: '$v_dir'";
 
 ########################################################################
 # test reading version from "use" or "no".
@@ -48,25 +46,55 @@ SKIP:
     or 
     skip "Botched test: no perl version in '$base'.", 1;
 
-    note "Testing perl version: '$perl_v'.";
-
-    version->parse( $perl_v )->numify
-    or skip "Botched test: non-parsable '$perl_v' ($base).";
-
-    -d $v_dir
-    or skip "Botched test: missing '$v_dir'";
-
-    for ( $v_file )
+    if( version->parse( $perl_v )->numify )
     {
-        open my $fh, '>', $_
-        or skip "Failed opening: '$_'";
-
-        print $fh, $perl_v;
+        note "Testing perl version: '$perl_v'.";
+    }
+    else
+    {
+        skip "Botched test: non-parsable '$perl_v' ($base).";
     }
 
-    require_ok $madness;
+    my $v_file
+    = eval
+    {
+        if
+        (
+            my ( $fh, $path ) 
+            = tempfile 'perl_version.XXXX'
+        )
+        {
+            print $fh "use $perl_v;\n"
+            or die "Failed print: '$path', $!\n";
 
-    $madness->import( @argz );
+            close $fh
+            or die "Failed close: '$path', $!\n";
+
+            END
+            {
+                if( -e $path )
+                {
+                    unlink $path
+                    or warn "Failed unlink: '$path', $!";
+                }
+            }
+
+            $path
+        }
+        else
+        {
+            die "Failed 'tempfile', $!\n";
+        }
+    }
+    or skip $@, 1;
+
+    eval
+    {
+        my @argz    = ( use_dir => 1,  version_from => $v_file );
+
+        use_ok $madness => @argz
+    }
+    or skip "Use failed; $@", 1;
 
     for my $found ( scalar $madness->source_files )
     {

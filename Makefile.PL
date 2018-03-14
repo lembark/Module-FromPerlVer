@@ -7,6 +7,7 @@ use strict;
 use version;
 
 use ExtUtils::MakeMaker;
+my $mm_ver = ExtUtils::MakeMaker->VERSION;
 
 ########################################################################
 # package variables
@@ -91,6 +92,20 @@ WriteMakefile
     {
         TESTS => 't/*.t t/*/*.t'
     },
+    ($mm_ver < 6.46 ? () : (META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+            repository => {
+                url => 'https://github.com/lembark/Module-FromPerlVer.git',
+                web => 'https://github.com/lembark/Module-FromPerlVer',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://rt.cpan.org/Dist/Display.html?Name=Module-FromPerlVer',
+            },
+        },
+    })),
 );
 
 __END__

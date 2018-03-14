@@ -13,7 +13,7 @@ use ExtUtils::MakeMaker;
 ########################################################################
 
 my $path    = 'lib/Module/FromPerlVer.pm';
-my $version = '0.4.4'; 
+my $version = '0.5.0'; 
 
 ########################################################################
 # set up sandbox & version directory, generate dynamic tests

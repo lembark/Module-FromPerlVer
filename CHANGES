@@ -1,3 +1,7 @@
+-   v0.5.1
+
+    Improve tests for edge cases in the versions (e.g., reject "no 5.0.0").
+
 -   v0.5.0 Tue Mar 13 18:24:57 CDT 2018
 
     Working version_from handler.

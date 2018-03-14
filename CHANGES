@@ -1,9 +1,14 @@
--   v0.5.1
+-   v0.5.1 Wed Mar 14 13:43:46 CDT 2018
 
-    Improve tests for edge cases in the versions (e.g., reject "no 5.0.0").
+    Handle edge case "no 5.0.0".
 
     Search up $Bin for version directory. Simplifies handing standard
-    path with test sub-dirs.
+    path with test sub-dirs. "version_dir" can be path to any existing
+    directory or the path will be searched up $Bin to the root.
+
+    Test cleanups.
+
+    More example output in POD.
 
 -   v0.5.0 Tue Mar 13 18:24:57 CDT 2018
 

@@ -61,3 +61,4 @@ t/bin/make-*-dir & t/bin/make-tests will set up the test environment
 the first time. These are called from Makefile.PL. Runningn the 
 Makefile.PL with "TEST_EXTRACT=1" will rm -rf the ./t/version and
 and ./t/sandbox/.git dir's to validate the setup code.
+

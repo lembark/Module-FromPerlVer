@@ -8,12 +8,14 @@ use strict;
 use version;
 use parent  qw( Module::FromPerlVer::Extract );
 
-use Cwd                     qw( cwd             );
-use File::Basename          qw( basename        );
-use File::Copy::Recursive   qw( dircopy         );
-use File::Find              qw( find            );
-use FindBin                 qw( $Bin            );
-use List::Util              qw( first           );
+use Carp                    qw( croak               );
+use Cwd                     qw( cwd                 );
+use File::Basename          qw( basename dirname    );
+use File::Copy::Recursive   qw( dircopy             );
+use File::Find              qw( find                );
+use File::Spec::Functions   qw( catpath             );
+use FindBin                 qw( $Bin                );
+use List::Util              qw( first               );
 
 ########################################################################
 # package variables & sanity checks
@@ -22,46 +24,75 @@ use List::Util              qw( first           );
 our $VERSION    = version->parse( 'v0.1.0' )->numify;
 
 ########################################################################
+# utility subs
+########################################################################
+
+my $search_bin
+= sub
+{
+    my $base    = shift;
+    my $whence  = $Bin;
+
+    for(;;)
+    {
+        my $path    = catpath '' => $whence, $base;
+
+        -e $path
+        and return $path;
+
+        $whence = dirname $whence;
+
+        '/' eq $whence
+        and return;
+    }
+
+    # code never reaches this point.
+};
+
+########################################################################
 # methods
 ########################################################################
 
 sub source_prefix
 {
+$DB::single = 1;
+
     my $extract = shift;
-    my $dir     = $extract->{ version_dir };
+    my $dir     = $extract->{ version_dir }
+    or die "Bogus source_prefix: false 'version_dir'";
 
     # order of paths will prefer "./t/version" to 
     # "./version" during testing.
 
     my $path
-    = first
-    {
-        -e 
-    }
-    (
-        "$Bin/$dir" ,
-        "./$dir"    ,
-    )
-    or die "Bogus version_prefix: Non-existant: '$dir' ($Bin)";
+    = -e $dir
+    ? $dir
+    : $search_bin->( $dir )
+    or
+    die "Botched source_prefix: non-existent '$dir' ($Bin).\n";
+
+    # in any case, if we get this far the last stat was $path.
+
+    -d _        or die "Bogus version_prefix: non-dir      '$path'\n";
+    -r _        or die "Bogus version_prefix: non-readable '$path'\n";
+    -x _        or die "Bogus version_prefix: non-execable '$path'\n";
 
     for my $cwd ( cwd )
     {
-        # convert $path to relative.
+        # convert $path to relative for easier viewing.
 
-        my $i   = length $cwd;
-
-        index $path, "$cwd/"
-        or
-        substr $path, 0, $i, '.'
+        index $path, $cwd
+        or 
+        substr $path, 0, length( $cwd ), '.'
     }
 
-    -e $path    or die "Bogus version_prefix: non-existant '$path'";
-    -d _        or die "Bogus version_prefix: non-dir      '$path'";
-    -r _        or die "Bogus version_prefix: non-readable '$path'";
-    -x _        or die "Bogus version_prefix: non-execable '$path'";
+    # belt and suspenders.
+
+    -e $path
+    or croak "Bogus source_prefix: mis-handled '$path' ($dir).";
 
     my @found   = glob "$path/*"
-    or die "Botchd version_prefix: '$path' is empty directory.\n";
+    or die "Bogus version_prefix: '$path' is empty directory.\n";
 
     # caller gets back the relpath to the version dir.
     # cache it for later use in this module.

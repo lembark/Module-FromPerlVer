@@ -29,19 +29,5 @@ for my $madness
     ok $ver, "$madness has VERSION '$ver'";
 }
 
-for( qx{git --version} )
-{
-    if( my $status = $? )
-    {
-        fail "git --version returns $?, git tests will be skipped.";
-    }
-    else
-    {
-        chomp;
-
-        pass "Git version: '$_'";
-    }
-}
-
 done_testing;
 __END__

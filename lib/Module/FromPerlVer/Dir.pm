@@ -23,6 +23,8 @@ use List::Util              qw( first               );
 
 our $VERSION    = version->parse( 'v0.1.0' )->numify;
 
+our @CARP_NOT   = ( __PACKAGE__ );
+
 ########################################################################
 # utility subs
 ########################################################################
@@ -33,20 +35,21 @@ my $search_bin
     my $base    = shift;
     my $whence  = $Bin;
 
-    for(;;)
+    while( '/' ne $whence )
     {
         my $path    = catpath '' => $whence, $base;
 
         -e $path
-        and return $path;
+        or next;
 
+        return $path
+    }
+    continue
+    {
         $whence = dirname $whence;
-
-        '/' eq $whence
-        and return;
     }
 
-    # code never reaches this point.
+    croak "Bogus source_prefix: no '$base' in or above '$Bin'";
 };
 
 ########################################################################
@@ -55,8 +58,6 @@ my $search_bin
 
 sub source_prefix
 {
-$DB::single = 1;
-
     my $extract = shift;
     my $dir     = $extract->{ version_dir }
     or die "Bogus source_prefix: false 'version_dir'";
@@ -72,6 +73,7 @@ $DB::single = 1;
     die "Botched source_prefix: non-existent '$dir' ($Bin).\n";
 
     # in any case, if we get this far the last stat was $path.
+    # report any errors using the absolute path.
 
     -d _        or die "Bogus version_prefix: non-dir      '$path'\n";
     -r _        or die "Bogus version_prefix: non-readable '$path'\n";

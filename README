@@ -1,15 +1,15 @@
-Ever have to give up using a new, really useful feature in Perl 
+Ever have to give up using a new, really useful feature in Perl
 because someone on Centos uses 5.8?
 
-Not sure what will work with PerlBrew if you have five versions 
+Not sure what will work with PerlBrew if you have five versions
 of Perl installed with your modules?
 
 No longer. Now you Makefile.PL can use the correct Perl Version.
 
-This started when I wanted to upgrade FindBin::libs and couldn't 
+This started when I wanted to upgrade FindBin::libs and couldn't
 because too many users were stuck on 5.8 (or 5.00503!). I didn't
 want to check $^V every time the thing ran, the installed Perl
-version isn't going to change with each run. So I copy the 
+version isn't going to change with each run. So I copy the
 a version of the module for $^V < v5.9 and have antoher one
 that uses newer features.
 
@@ -37,9 +37,9 @@ Basic use:
 
     use Module::FromPerlVer qw( use_dir 1 );    # copy from dir
     use Module::FromPerlVer qw( use_git 1 );    # checkout with tag
-    
+
 (3) The contents of your install directory are populated
-    via bulk copy from ./version of the higest version 
+    via bulk copy from ./version of the higest version
     number not greater than the Perl used for installation
     or checkout of tag for the higest Perl version.
 
@@ -48,7 +48,7 @@ of Perl you can pass ( perl_version => X ) to ignore $^V and
 run the code as if the perl's v-string is X.
 
 The filesystem structure should support any versioning system:
-SVN users can simply check out branch tags into ./version or 
+SVN users can simply check out branch tags into ./version or
 use "source_dir=branch"; rcs, cvs, or git users can either use
 tags or just export the static branches into ./versions. Either
 way, the versioning should be straightforward to maintain. The
@@ -57,8 +57,8 @@ biggest hurdle is overcoming muscle-memory to edit files under
 
 Notes to anyone editing the module:
 
-t/bin/make-*-dir & t/bin/make-tests will set up the test environment 
-the first time. These are called from Makefile.PL. Runningn the 
+t/bin/make-*-dir & t/bin/make-tests will set up the test environment
+the first time. These are called from Makefile.PL. Running the
 Makefile.PL with "TEST_EXTRACT=1" will rm -rf the ./t/version and
 and ./t/sandbox/.git dir's to validate the setup code.
 

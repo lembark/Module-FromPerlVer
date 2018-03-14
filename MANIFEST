@@ -25,7 +25,7 @@ t/bin/21-git-local-defaults_t
 t/bin/30-file-version-from_t
 t/bin/31-git-local-version-from_t
 
-t/bin/make-sandbox
+t/bin/make-sandbox-tarball
 t/bin/make-tests
 t/bin/make-version-dir
 

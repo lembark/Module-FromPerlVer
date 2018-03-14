@@ -1,3 +1,14 @@
+-   v0.5.2 Wed Mar 14 16:16:10 CDT 2018
+
+    Fix no 5.0 test to account for '5' or '5.'.
+
+    Add test 13-*.t to check full variety of versions with 'no 5',
+    hence the improvements in the no-5.0 check.
+
+    Fix MANIFEST.
+
+    Add strict to tests, fix undef vars.
+
 -   v0.5.1 Wed Mar 14 13:43:46 CDT 2018
 
     Handle edge case "no 5.0.0".

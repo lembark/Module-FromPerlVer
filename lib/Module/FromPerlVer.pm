@@ -167,7 +167,7 @@ my $extract_perl_v
             if
             (
                 my ( $min_v )
-                = m{ \b use \s+ (v? 5[.][\d.]+) \s* }x
+                = m{ \b use \s+ (v? 5[\d.]*) \s* }x
             )
             {
                 $perl_v 
@@ -183,10 +183,10 @@ DIE
             elsif
             (
                 my ( $max_v ) 
-                = m{ \b no \s+ (v? 5[.][\d.]+) \s* }x
+                = m{ \b no  \s+ (v? 5[\d.]*) \s* }x
             )
             {
-                $max_v > '5.0'
+                $max_v > 5.0
                 or
                 die <<"DIE";
 Botched version_from: no '$max_v' must be > 5.0.

@@ -3,6 +3,7 @@
 ########################################################################
 
 use 5.006;
+use strict;
 use version;
 
 use Test::More;
@@ -46,7 +47,7 @@ SKIP:
     {
         my $expect  = './t/version';
 
-        is $prefix, $expect, "Source prefix: '$found' ($expect)";
+        is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
     }
 
     for my $found ( scalar $madness->source_files )

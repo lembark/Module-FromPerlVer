@@ -7,6 +7,7 @@
 # will test varieties of the same perl version string.
 
 use 5.006;
+use strict;
 use version;
 
 use Test::More;
@@ -61,7 +62,7 @@ SKIP:
 
     my $prefix  = $madness->source_prefix;
 
-    is $prefix, 'perl/', "Source prefix: '$found' (perl/)";
+    is $prefix, 'perl/', "Source prefix: '$prefix' (perl/)";
 
     for my $found ( $madness->source_files )
     {
@@ -72,8 +73,6 @@ SKIP:
 
     eval
     {
-$DB::single = 1;
-
         chomp( my $found = ( qx{ git branch } )[0] );
 
         ok 0 < index( $found, $prefix ),

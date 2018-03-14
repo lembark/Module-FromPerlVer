@@ -10,8 +10,6 @@ use 5.006;
 use strict;
 use version;
 
-use NEXT;
-
 use Cwd                     qw( cwd                     );
 use File::Basename          qw( basename                );
 use File::Copy::Recursive   qw( dircopy                 );

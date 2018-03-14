@@ -152,40 +152,56 @@ my $extract_perl_v
     }
     elsif( my $path = $extract->value( 'version_from' ) )
     {
-        -e $path or die "Bogus version_from: non-existant '$path'\n";
-        -f _     or die "Bogus version_from: non-file     '$path'\n";
-        -s _     or die "Bogus version_from: zero-size    '$path'\n";
-        -r _     or die "Bogus version_from: non-readable '$path'\n";
+        -e $path or die "Botched version_from: non-existant '$path'\n";
+        -r _     or die "Botched version_from: non-readable '$path'\n";
+        -s _     or die "Botched version_from: zero-size    '$path'\n";
 
         # at this point the version file seems minimally usable.
 
         open my $fh, '<', $path
         or
-        die "Botched version_from: open '$path', $!\n";
+        die "Failed open: '$path', $!\n";
 
         first
         {
             if
             (
                 my ( $min_v )
-                = m{ \buse \s+ (v? 5[.].+?) ; }x
+                = m{ \b use \s+ (v? 5[.][\d.]+) \s* }x
             )
             {
                 $perl_v 
                 = version->parse( $min_v )->numify
                 or 
-                die "Invalid version string: '$_' ($path)"
+                die <<"DIE";
+Botched version_from: invalid version string '$min_v'.
+From:  '$path'
+Input: '$_'
+
+DIE
             }
             elsif
             (
                 my ( $max_v ) 
-                = m{ \bno  \s+ (v? 5[.].+? ;) }x
+                = m{ \b no \s+ (v? 5[.][\d.]+) \s* }x
             )
             {
+                $max_v > '5.0'
+                or
+                die <<"DIE";
+Botched version_from: no '$max_v' must be > 5.0.
+From:  '$path'
+Input: '$_'
+
+DIE
                 $perl_v
                 = version->parse( $max_v )->numify - 0.000001
                 or 
-                die "Invalid version string: '$_' ($path)"
+                die <<"DIE"
+Botched version_from: invalid version string '$max_v'.
+From:  '$path'
+Input: '$_'
+DIE
             }
             else
             {
@@ -194,7 +210,7 @@ my $extract_perl_v
         }
         readline $fh
         or
-        die "Bogus version_from: '$path' lacks '(use|no) version'.\n";
+        die "Botched version_from: '$path' lacks '(use|no) version'.\n";
     }
     else
     {
@@ -204,6 +220,9 @@ my $extract_perl_v
         or
         die "Severe weirdness: unparsable \$^V ($^V).\n";
     }
+
+    # at this point the version has been parsed and numified.
+    # it is usable for comparision to version dir's or tags.
 
     $extract->value( perl_version => $perl_v )
 };
@@ -802,6 +821,8 @@ The module supplies most of the information necessary to
 debug environment and configuration issues when import()
 is called.
 
+The leading '#' in messages simplify handling output with TAP.
+
 For example, using a version directory gives:
 
     # Def: default_use = 'dir'
@@ -819,8 +840,34 @@ For example, using a version directory gives:
     # Install cleanup.
     # Get files with: 'Dir'
 
-The leading '#' are included to avoid causing trouble with 
-modules that depend on TAP.
+Another example with a file_from input (t/bin/30*_t):
+
+    # Testing perl version: '5.005003'.
+    # Def: git_prefix = 'perl/'
+    # Arg: use_dir = '1'
+    # Def: git_repo_file = 'git-repository.tar'
+    # Arg: version_from = 'perl_version.RE0R'
+    # Def: default_use = 'dir'
+    # Def: version_dir = 'version'
+    # Extract with: 'Dir' (Module::FromPerlVer::Dir)
+    # Perl version: 5.005003
+    # Source prefix: ./t/version
+    # Module version: 5.001000 <= 5.005003
+    # Module source: ./t/version/v5.000001
+    # Source files:
+    #       ./lib/Foo.pm
+    #       ./lib/Bar.pm
+    #       ./pod/Foo.pod
+    #       ./pod/Bar.pod
+    #       ./etc/Foo.dat
+    #       ./etc/Bar.dat
+    # Install cleanup.
+    # Get files with: 'Dir'
+    # Processed: 10 files/dirs from './t/version/v5.000001'
+
+The arguments parsed were "use_dir" and "version-from" using
+1 and a tempfile. Notice it found the "verison" directory
+in "./t/version".
 
 =over 4
 

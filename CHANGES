@@ -1,3 +1,7 @@
+-   v0.5.3
+
+    Unlink all version.* tmp files.
+
 -   v0.5.2 Wed Mar 14 16:16:10 CDT 2018
 
     Fix no 5.0 test to account for '5' or '5.'.

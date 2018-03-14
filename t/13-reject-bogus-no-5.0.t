@@ -19,6 +19,8 @@ SKIP:
     require_ok $madness
     or BAIL_OUT "Failed require: '$madness'", 1;
 
+    my @tmp_filz    = ();
+
     for my $pref ( '', 'v' )
     {
         for my $fmt
@@ -58,13 +60,12 @@ SKIP:
                     close $fh
                     or die "Failed close: '$path', $!\n";
 
+                    push @tmp_filz, $path;
+
                     END
                     {
-                        if( -e $path )
-                        {
-                            unlink $path
-                            or warn "Failed unlink: '$path', $!";
-                        }
+                        -e && unlink
+                        for @tmp_filz;
                     }
 
                     $path

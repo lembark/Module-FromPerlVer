@@ -29,7 +29,15 @@ and do
     if $err;
 };
 
-for my $base ( qw( make-version-dir make-sandbox-dir make-tests ) )
+for my $base 
+(
+    qw
+    (
+        make-version-dir
+        make-sandbox-dir
+        make-tests
+    )
+)
 {
     my $path    = "t/bin/$base";
 

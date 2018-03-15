@@ -34,8 +34,10 @@ my $search_bin
 {
     my $base    = shift;
     my $whence  = $Bin;
+    my $sanity  = dirname $whence;
 
-    while( '/' ne $whence )
+
+    while( $sanity ne $whence )
     {
         my $path    = catpath '' => $whence, $base;
 
@@ -46,7 +48,8 @@ my $search_bin
     }
     continue
     {
-        $whence = dirname $whence;
+        $whence = $sanity;
+        $sanity = dirname $whence;
     }
 
     croak "Bogus source_prefix: no '$base' in or above '$Bin'";

@@ -1,6 +1,10 @@
--   v0.5.3
+-   v0.5.3 Wed Mar 14 22:18:31 CDT 2018
 
     Unlink all version.* tmp files.
+
+    Deal with MSW filesystem not using '/' for the root.
+
+    Missing file in MANIFEST.
 
 -   v0.5.2 Wed Mar 14 16:16:10 CDT 2018
 

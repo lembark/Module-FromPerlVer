@@ -25,7 +25,7 @@ t/11-use_dir.t
 t/12-dir-default-use.t
 t/13-reject-bogus-no-5.0.t
 
+t/bin/make-sandbox-dir
 t/bin/make-sandbox-tarball
 t/bin/make-tests
 t/bin/make-version-dir
-

@@ -1,6 +1,7 @@
 #!/bin/env perl
 
 use File::Basename;
+use Archive::Tar;
 
 my $sand_d  = "t/sandbox";
 my $git_d   = "$sand_d/.git";

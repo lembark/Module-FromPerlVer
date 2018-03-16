@@ -1,3 +1,13 @@
+-   v0.5.4
+
+    Fix make-sandbox-dir.
+
+    Fix MANIFEST
+
+    Alwyas remove version, dynamic, sandbox/.git dir's in ./t 
+    to force running the build code during module packaging.
+    
+
 -   v0.5.3 Wed Mar 14 22:18:31 CDT 2018
 
     Unlink all version.* tmp files.

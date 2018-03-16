@@ -138,6 +138,8 @@ my $make_extract
 my $extract_perl_v
 = sub
 {
+$DB::single = 1;
+
     my $extract = shift;
     my $perl_v  = '';
 
@@ -167,7 +169,7 @@ my $extract_perl_v
             if
             (
                 my ( $min_v )
-                = m{ \b use \s+ (v? 5[\d.]*) \s* }x
+                = m{ \b use \s+ (v? 5[\d._]*) \s* }x
             )
             {
                 $perl_v 
@@ -183,7 +185,7 @@ DIE
             elsif
             (
                 my ( $max_v ) 
-                = m{ \b no  \s+ (v? 5[\d.]*) \s* }x
+                = m{ \b no  \s+ (v? 5[\d._]*) \s* }x
             )
             {
                 $max_v > 5.0

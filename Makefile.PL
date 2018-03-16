@@ -13,21 +13,14 @@ use ExtUtils::MakeMaker;
 ########################################################################
 
 my $path    = 'lib/Module/FromPerlVer.pm';
-my $version = '0.5.3'; 
+my $version = '0.5.4'; 
 
 ########################################################################
 # set up sandbox & version directory, generate dynamic tests
 ########################################################################
 
-$ENV{ TEST_EXTRACT }
-and do
-{
-    system "rm -rf ./t/version t/sandbox/.git";
-    my $err = $?;
-    
-    print "Failed rm: '$err' (TEST_EXTRACT)"
-    if $err;
-};
+system "rm -rf ./t/version t/dynamic t/sandbox/.git"
+and print "Failed rm: '$?' ($!)";
 
 for my $base 
 (

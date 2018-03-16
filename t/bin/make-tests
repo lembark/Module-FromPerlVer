@@ -17,6 +17,9 @@ use List::Util      qw( pairs pairmap       );
 my $dir = ( dirname $0 ) . '/..';
 my $dyn = "$dir/dynamic";
 
+-d $dyn || mkdir $dyn => 0770
+or die "Failed mkdir: '$dyn', $!";
+
 my @v_stringz
 = do
 {

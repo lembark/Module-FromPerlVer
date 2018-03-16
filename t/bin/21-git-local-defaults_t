@@ -17,43 +17,30 @@ use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
 use lib "$Bin/../lib";
+use Test::KwikHaks;
 
 my $madness = 'Module::FromPerlVer';
-my $sandbox = "$Bin/sandbox";
-
-note "Test sandbox: '$sandbox'";
 
 SKIP:
 {
-    my $base    = basename $0, '.t';
+    my ( $base, $perl_v )  
+    = eval
+    {
+        Test::KwikHaks::perl_v_from_basename()
+    }
+    or BAIL_OUT "Missing Perl Version: $@";
 
-    my ( $perl_v )
-    =  $base =~ m{ .* defaults \W+ (.+) }x
-    or 
-    skip "Botched test: no perl version in '$base'.", 1;
+    eval
+    {
+        Test::KwikHaks::test_git_version()
+    }
+    or skip "Git not available ($@)", 1;
 
-    note "Testing perl version: '$perl_v'.";
-
-    version->parse( $perl_v )->numify
-    or skip "Botched test: non-parsable '$perl_v' ($base).";
-
-    chomp( my $git = qx( git --version ) );
-
-    note "git version: '$git'";
-
-    like $git, qr{^ git }x, "Git version: '$git'"
-    or skip 'Failed running git.', 1;
-
-    -d $sandbox
-    or skip "Non-existant: '$sandbox'", 1;
+    my $sandbox = Test::KwikHaks::sandbox_path()
+    or skip "Non-existant: 'sandbox'", 1;
 
     chdir $sandbox
-    or skip "Faild chdir '$sandbox', $!\n", 1;
-    
-    # clean any previous test files.
-    # this leaves the .git.tar, .git.
-
-    system '/bin/rm -rf *';
+    or skip "Failed chdir: '$sandbox', $!", 1;
 
     local $ENV{ PERL_VERSION } = $perl_v;
 
@@ -73,8 +60,6 @@ SKIP:
 
     eval
     {
-$DB::single = 1;
-
         chomp( my $found = ( qx{ git branch } )[0] );
 
         ok 0 < index( $found, $prefix ),

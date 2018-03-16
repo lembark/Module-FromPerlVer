@@ -12,6 +12,9 @@ use Test::Deep;
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
+use lib "$Bin/../lib";
+use Test::KwikHaks;
+
 my $madness = 'Module::FromPerlVer';
 my $v_dir   = 'version';
 
@@ -19,21 +22,12 @@ note "Test sandbox: '$v_dir'";
 
 SKIP:
 {
-    my $base    = basename $0, '.t';
-
-    my ( $perl_v )
-    =  do
+    my ( $base, $perl_v )  
+    = eval
     {
-        my $i   = rindex $base, '-';
-        substr $base, ++$i
+        Test::KwikHaks::perl_v_from_basename()
     }
-    or 
-    skip "Botched test: no perl version in '$base'.", 1;
-
-    note "Testing perl version: '$perl_v'.";
-
-    version->parse( $perl_v )->numify
-    or skip "Botched test: non-parsable '$perl_v' ($base).";
+    or BAIL_OUT "Missing Perl Version: $@";
 
     local $ENV{ PERL_VERSION } = $perl_v;
 

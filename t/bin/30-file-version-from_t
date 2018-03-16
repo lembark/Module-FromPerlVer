@@ -16,10 +16,11 @@ use version;
 use Test::More;
 use Test::Deep;
 
-use File::Temp      qw( tempfile    );
-
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
+
+use lib "$Bin/../lib";
+use Test::KwikHaks;
 
 ########################################################################
 # package variables 
@@ -35,58 +36,15 @@ delete $ENV{ PERL_VERSION };
 
 SKIP:
 {
-    my $base    = basename $0, '.t';
-
-    my ( $perl_v )
-    =  do
-    {
-        my $i   = rindex $base, '-';
-        substr $base, ++$i
-    }
-    or 
-    skip "Botched test: no perl version in '$base'.", 1;
-
-    if( version->parse( $perl_v )->numify )
-    {
-        note "Testing perl version: '$perl_v'.";
-    }
-    else
-    {
-        skip "Botched test: non-parsable '$perl_v' ($base).";
-    }
-
-    my $v_file
+    my ( $base, $perl_v )  
     = eval
     {
-        if
-        (
-            my ( $fh, $path ) 
-            = tempfile 'perl_version.XXXX'
-        )
-        {
-            print $fh "use $perl_v;\n"
-            or die "Failed print: '$path', $!\n";
-
-            close $fh
-            or die "Failed close: '$path', $!\n";
-
-            END
-            {
-                if( -e $path )
-                {
-                    unlink $path
-                    or warn "Failed unlink: '$path', $!";
-                }
-            }
-
-            $path
-        }
-        else
-        {
-            die "Failed 'tempfile', $!\n";
-        }
+        Test::KwikHaks::perl_v_from_basename()
     }
-    or skip $@, 1;
+    or BAIL_OUT "Missing Perl Version: $@";
+
+    my $v_file  = Test::KwikHaks::write_version_file( $perl_v )
+    or skip "Failed writing version file.", 1;
 
     eval
     {
@@ -96,11 +54,18 @@ SKIP:
     }
     or skip "Use failed; $@", 1;
 
+    for my $prefix ( $madness->source_prefix )
+    {
+        my $expect  = './t/version';
+
+        is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
+    }
+
     for my $found ( scalar $madness->source_files )
     {
         @$found
-        ? pass 'Found source files in version directory'
-        : fail 'Missing source files for cleanup'
+        ? pass 'Acquired source files in version directory.'
+        : fail 'No source files for cleanup.'
         ;
 
         note "Source files:\n", explain $found;

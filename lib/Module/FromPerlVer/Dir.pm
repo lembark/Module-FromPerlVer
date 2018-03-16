@@ -13,9 +13,17 @@ use Cwd                     qw( cwd                 );
 use File::Basename          qw( basename dirname    );
 use File::Copy::Recursive   qw( dircopy             );
 use File::Find              qw( find                );
-use File::Spec::Functions   qw( catpath             );
 use FindBin                 qw( $Bin                );
 use List::Util              qw( first               );
+
+use File::Spec::Functions
+qw
+(
+    &splitpath
+    &splitdir
+    &catpath
+    &catdir
+);
 
 ########################################################################
 # package variables & sanity checks
@@ -33,23 +41,22 @@ my $search_bin
 = sub
 {
     my $base    = shift;
-    my $whence  = $Bin;
-    my $sanity  = dirname $whence;
 
+    my( $vol, $dir ) = splitpath $Bin, 1;
 
-    while( $sanity ne $whence )
+    for
+    (
+        my @dirz    = splitdir $dir
+        ;
+        @dirz > 1
+        ;
+        pop @dirz
+    )
     {
-        my $path    = catpath '' => $whence, $base;
+        my $path    = catpath $vol, ( catdir @dirz ), $base;
 
         -e $path
-        or next;
-
-        return $path
-    }
-    continue
-    {
-        $whence = $sanity;
-        $sanity = dirname $whence;
+        and return $path;
     }
 
     croak "Bogus source_prefix: no '$base' in or above '$Bin'";

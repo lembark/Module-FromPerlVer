@@ -161,6 +161,8 @@ sub source_prefix
 
 sub module_sources
 {
+$DB::single = 1;
+
     my $extract = shift;
     my $dir     = getcwd;
 
@@ -207,6 +209,8 @@ sub source_files
 
 sub get_files
 {
+$DB::single = 1;
+
     my $extract = shift;
     my $tag     = $extract->value( 'module_source' );
 

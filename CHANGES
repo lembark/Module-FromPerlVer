@@ -1,3 +1,11 @@
+-   v0.5.8
+
+    Replace /bin/env with /usr/bin/env as possibly the only thing with a 
+    more-or-less stable path across systems... Thanks to Thomas Klausner
+    for checking this across systems for me.
+
+    Ditto replacing #!/bin/bash with #!/usr/bin/env bash
+
 -   v0.5.7
 
     Looking at it... probably want to search $Bin for git artifiacts
@@ -5,6 +13,8 @@
     relative to location of Makefile.PL rather than t/foobar. In most
     cases only one will find something, makes more sense to search in
     the users' order rather than for testing.
+
+    Remmove extraneous tag from MANIFEST
 
 -   v0.5.6
 

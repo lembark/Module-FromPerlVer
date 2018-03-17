@@ -91,7 +91,8 @@ my $extract_args
                 # isn't overridden and it false,
                 # no argument supplied: skip it.
 
-                print "# Skip: $k is false";
+                print "#  Skip: $k is false"
+                if $verbose;
             }
         }
     }

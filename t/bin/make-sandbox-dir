@@ -1,11 +1,22 @@
-#!/bin/env perl
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
 
 use File::Basename;
 use Archive::Tar;
 
+########################################################################
+# package variables 
+########################################################################
+
 my $sand_d  = "t/sandbox";
 my $git_d   = "$sand_d/.git";
 my $tball   = "$git_d.tar";
+
+########################################################################
+# generate the ./git directory with version tags.
+########################################################################
 
 for( qx{git --version} )
 {
@@ -51,5 +62,6 @@ else
     print "Git.pm tests will skip: missing '$git_d' and '$tball'.\n";
 }
 
+# this isn't a module
 0
 __END__

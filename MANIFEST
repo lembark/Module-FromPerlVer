@@ -34,7 +34,6 @@ t/bin/31-git-local-version-from_t
 t/bin/make-sandbox-dir
 t/bin/make-sandbox-tarball
 t/bin/make-tests
-t/bin/make-tests~
 t/bin/make-version-dir
 
 t/lib/Test/KwikHaks.pm

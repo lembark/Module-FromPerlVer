@@ -1,4 +1,4 @@
-########################################################################
+#######################################################################
 # housekeeping
 ########################################################################
 
@@ -14,7 +14,7 @@ my $mm_ver = ExtUtils::MakeMaker->VERSION;
 ########################################################################
 
 my $path    = 'lib/Module/FromPerlVer.pm';
-my $version = '0.5.5'; 
+my $version = '0.5.6'; 
 
 ########################################################################
 # set up sandbox & version directory, generate dynamic tests
@@ -44,6 +44,64 @@ for my $base
     if $err;
 }
 
+my @test_spec = 
+(
+    test =>
+    {
+        TESTS => 't/*.t t/*/*.t'
+    }
+);
+
+my @dist_spec =
+(
+    dist =>
+    {
+        # the local_repo.tar is *not* in the MANIFEST.
+        # it is used here for validating the POD
+        # telling people how to make a tarball.
+
+        PREOP =>
+        q{ cd t/sandbox/ && /bin/tar cvf .git.tar .git },
+    }
+);
+
+my @merge_spec
+= do
+{
+    if( $mm_ver < 6.46 )
+    {
+        ()
+    }
+    else
+    {
+        my $web = 'https://github.com/lembark/Module-FromPerlVer';
+        my $url = $web . '.git';
+
+
+        META_MERGE => 
+        {
+            'meta-spec' =>
+            {
+                version => 2
+            },
+            dynamic_config => 1,
+            resources => 
+            {
+                repository => 
+                {
+                    web  => $web, 
+                    url  => $url,
+                    type => 'git',
+                },
+                bugtracker => 
+                {
+                    web => 'https://rt.cpan.org/Dist/Display.html?Name=Module-FromPerlVer',
+                },
+            },
+        }
+    }
+ };
+
 WriteMakefile
 (
     NAME            => 'Module::FromPerlVer',
@@ -55,13 +113,17 @@ WriteMakefile
     {
         # standard distro, particular versions 
         # are unlikely to cause pain.
+        #
+        # note: Cwd has a fix that may avoid 
+        # infinite looping in test for "abs_path '//'".
+        # hopefully adding that here will fix the issue.
 
 		qw
         (
+            Cwd                     3.73
 
             Archive::Tar            0
             Carp                    0
-            Cwd                     0
             File::Basename          0
             File::Copy::Recursive   0
             File::Find              0
@@ -79,34 +141,10 @@ WriteMakefile
 
     },
 
-    dist =>
-    {
-        # the local_repo.tar is *not* in the MANIFEST.
-        # it is used here for validating the POD
-        # telling people how to make a tarball.
+    @dist_spec,
+    @test_spec,
+    @merge_spec,
 
-        PREOP =>
-        q{ cd t/sandbox/ && /bin/tar cvf .git.tar .git },
-    },
-
-    test =>
-    {
-        TESTS => 't/*.t t/*/*.t'
-    },
-    ($mm_ver < 6.46 ? () : (META_MERGE => {
-        'meta-spec' => { version => 2 },
-        dynamic_config => 1,
-        resources => {
-            repository => {
-                url => 'https://github.com/lembark/Module-FromPerlVer.git',
-                web => 'https://github.com/lembark/Module-FromPerlVer',
-                type => 'git',
-            },
-            bugtracker => {
-                web => 'https://rt.cpan.org/Dist/Display.html?Name=Module-FromPerlVer',
-            },
-        },
-    })),
 );
 
 __END__

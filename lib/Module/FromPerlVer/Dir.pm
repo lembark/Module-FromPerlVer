@@ -29,9 +29,10 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.1.0' )->numify;
-
+our $VERSION    = version->parse( 'v0.1.1' )->numify;
 our @CARP_NOT   = ( __PACKAGE__ );
+
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 ########################################################################
 # utility subs
@@ -44,6 +45,9 @@ my $search_bin
 
     my( $vol, $dir ) = splitpath $Bin, 1;
 
+    print "#  Search for: '$base' ('$vol' '$dir')"
+    if $verbose;
+
     for
     (
         my @dirz    = splitdir $dir
@@ -54,6 +58,9 @@ my $search_bin
     )
     {
         my $path    = catpath $vol, ( catdir @dirz ), $base;
+
+        print "#  Check: '$path'"
+        if $verbose;
 
         -e $path
         and return $path;
@@ -72,6 +79,9 @@ sub source_prefix
     my $dir     = $extract->{ version_dir }
     or die "Bogus source_prefix: false 'version_dir'";
 
+    print "#  Prefix from: '$dir'"
+    if $verbose;
+
     # order of paths will prefer "./t/version" to 
     # "./version" during testing.
 
@@ -81,6 +91,9 @@ sub source_prefix
     : $search_bin->( $dir )
     or
     die "Botched source_prefix: non-existent '$dir' ($Bin).\n";
+
+    print "#  Source dir: '$path'"
+    if $verbose;
 
     # in any case, if we get this far the last stat was $path.
     # report any errors using the absolute path.
@@ -97,6 +110,9 @@ sub source_prefix
         or 
         substr $path, 0, length( $cwd ), '.'
     }
+
+    print "#  Relative: '$path'"
+    if $verbose;
 
     # belt and suspenders.
 
@@ -136,8 +152,11 @@ sub source_files
     {
         my $path    = $File::Find::name;
 
-        $path ne $source_d
-        or return;
+        # don't copy the source directory itself,
+        # after that make all of them relaive paths.
+
+        $path eq $source_d
+        and return;
 
         my $rel     = '.' . substr $path, $n;
 
@@ -146,6 +165,11 @@ sub source_files
         ? 1
         : 0
         ;
+
+        print $i
+        ? "#  Add dir:  '$rel' [$i]"
+        : "#  Add file: '$rel' [$i]"
+        if $verbose;
 
         push @{ $pathz[ $i ] }, $rel;
     },

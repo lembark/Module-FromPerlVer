@@ -6,6 +6,7 @@ lib/Module/FromPerlVer.pm
 lib/Module/FromPerlVer/Git.pm
 lib/Module/FromPerlVer/Dir.pm
 lib/Module/FromPerlVer/Extract.pm
+lib/Module/FromPerlVer/Util.pm
 
 # this is the only piece of sandbox required.
 

@@ -17,6 +17,12 @@ use FindBin                 qw( $Bin            );
 use List::Util              qw( first           );
 use Symbol                  qw( qualify_to_ref  );
 
+use Module::FromPerlVer::Util
+qw
+(
+    search_bin
+);
+
 ########################################################################
 # package variables & sanity checks
 ########################################################################
@@ -38,50 +44,25 @@ my @restore     = qw( git checkout  --theirs                    );
 # utility subs
 ########################################################################
 
-my $locate_tarball
-= sub
-{
-    # note that $Bin may be ./t, in which case the
-    # extract may to move up a level.
-
-    my $extract = shift;
-    my $base    = shift;
-    my $root    = $Bin;
-
-    print "# Locate tarball: '$base' ($root).";
-
-    for(;;)
-    {
-        '/' eq $root
-        and return;
-
-        print "#\t$root";
-
-        -e and return $_
-        for "$root/$base";
-
-        $root       = dirname $root;
-    }
-
-    return
-};
-
 my @handlerz = 
 (
     # simplest case first, to more complicated.
+    # silently ignore anything that isn't found along the way.
 
     sub
     {
-        -e './.git'
+        search_bin '.git'
     },
 
     sub
     {
+        # lacking the tarball is fatal if the tarball is supplied.
+
         my $extract = shift;
         my $tball   = $extract->value( 'git_tarball' )
         or return;
 
-        my $path    = $extract->$locate_tarball( $tball )
+        my $path    = search_bin $tball
         or die "Missing: '$tball' ($Bin)";
 
         print "# Extract repo from: '$path'";
@@ -113,8 +94,7 @@ my @handlerz =
         print STDERR "\n# Cloning from: '$url'\n";
 
         my $output  = qx{ $cmd };
-
-        if( my $status  = $? )
+        if( my $error  = $? )
         {
             die <<END
 
@@ -164,7 +144,6 @@ sub module_sources
 $DB::single = 1;
 
     my $extract = shift;
-    my $dir     = getcwd;
 
     # whichever one returns indicates that there is a 
     # working .git directory.
@@ -182,8 +161,6 @@ $DB::single = 1;
     my $prefix  = $extract->value( 'git_prefix' )
     or
     die "Botched module_sources: no 'git_prefix' available.\n";
-    
-    # force a list context for qx to get tags as array.
 
     chomp
     (
@@ -192,7 +169,8 @@ $DB::single = 1;
     or
     die "No tags like '$prefix*' found.\n";
 
-    print join "\n#\t" => "# Git tags: '$prefix*'", @tagz;
+    print join "\n#\t" => "#  Git tags: '$prefix*'", @tagz
+    if $verbose;
 
     # at this point git should be able to checkout the
     # tag contents so get_files should work.
@@ -222,20 +200,25 @@ $DB::single = 1;
 
     $extract->value( restore_branch => $curr );
 
-    # no telling what the tag might look like.
-    # quotes protect it from the shell.
+    my $cmd
+    = do
+    {
+        # no telling what the tag might look like.
+        # quotes protect it from the shell.
 
-    my $cmd     = join ' ' => @checkout, $tag;
+        local $"    = ' ';
+        
+        "@checkout '$tag'"
+    };
 
-    my @status = qx{ $cmd };
-
-    if( $? )
+    my @output = qx{ $cmd };
+    if( my $err = $? )
     {
         local $, = "\n#\t";
 
-        chomp @status;
+        chomp @output;
 
-        print 'Checkout result:', @status;
+        print STDERR join "\n\t" => "Non-zero: $err ($cmd)", @output;
 
         die "Non-zero exit: $? from '$cmd'.\n";
     }

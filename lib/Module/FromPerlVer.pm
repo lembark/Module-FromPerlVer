@@ -26,7 +26,8 @@ use Module::FromPerlVer::Git;
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( '0.1.0' )->numify;
+our $VERSION    = version->parse( '0.1.1' )->numify;
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my %defaultz = 
 (
@@ -89,6 +90,8 @@ my $extract_args
                 # nothing more to do: the default
                 # isn't overridden and it false,
                 # no argument supplied: skip it.
+
+                print "# Skip: $k is false";
             }
         }
     }
@@ -127,10 +130,11 @@ my $make_extract
 
     my $type    = ucfirst $found[0];
     my $pkg     = qualify $type;
+    my $ver     = $pkg->VERSION;
 
     $argz->{ type } = $type;
 
-    print "# Extract with: '$type' ($pkg)";
+    print "# Extract with: '$type' ($pkg, $ver)";
 
     $pkg->new( $argz )
 };
@@ -138,22 +142,31 @@ my $make_extract
 my $extract_perl_v
 = sub
 {
-$DB::single = 1;
-
     my $extract = shift;
     my $perl_v  = '';
 
     if( my $v = $extract->value( 'perl_version' ) )
     {
+        print "#  Using perl_version: '$v'"
+        if $verbose;
+
         eval
         {
-            $perl_v = version->parse( $v )->numify
+            my $pass1   = version->parse( $v );
+
+            print "#  Parsed version: '$pass1'"
+            if $verbose;
+
+            $perl_v = $pass1->numify
         }
         or 
         die "Unparsable perl version: '$v'\n"
     }
     elsif( my $path = $extract->value( 'version_from' ) )
     {
+        print "#  Version path: '$path'"
+        if $verbose;
+
         -e $path or die "Botched version_from: non-existant '$path'\n";
         -r _     or die "Botched version_from: non-readable '$path'\n";
         -s _     or die "Botched version_from: zero-size    '$path'\n";
@@ -172,6 +185,9 @@ $DB::single = 1;
                 = m{ \b use \s+ (v? 5[\d._]*) \s* }x
             )
             {
+                print "#  Use version: '$_'"
+                if $verbose;
+
                 $perl_v 
                 = version->parse( $min_v )->numify
                 or 
@@ -188,6 +204,9 @@ DIE
                 = m{ \b no  \s+ (v? 5[\d._]*) \s* }x
             )
             {
+                print "#  No version: '$_'"
+                if $verbose;
+
                 $max_v > 5.0
                 or
                 die <<"DIE";
@@ -217,6 +236,9 @@ DIE
     else
     {
         # this *should* always be parseable.
+
+        print "#  Running Perl: '$^V'"
+        if $verbose;
 
         $perl_v = version->parse( $^V )->numify
         or
@@ -280,6 +302,9 @@ my @handlerz =
 
         my @sourcz  = $extract->module_sources
         or die "Botched module_sources: empty source list.\n";
+
+        print join "\n#\t" => "#  Sources: '$perl_v'", @sourcz
+        if $verbose;
 
         my $found
         =first
@@ -368,6 +393,12 @@ my @handlerz =
 
         if( my ( $filz, $dirz ) = source_files() )
         {
+            if( $verbose )
+            {
+                print join "\n#\t" => '# Cleanup source files:', @$filz;
+                print join "\n#\t" => '# Cleanup source dirs:',  @$dirz;
+            }
+
             *$ref
             = sub
             {
@@ -396,7 +427,7 @@ my @handlerz =
         {
             *$ref   = sub{};
 
-            print '# Nothing to clean up.';
+            print '# No source files.';
         }
 
         return

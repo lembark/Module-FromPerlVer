@@ -1,3 +1,18 @@
+-   v0.5.6
+
+    Add META_MERGE into Makefile.PL for git (thanks to Jim Keenan).
+
+    Require Cwd 3.73, hopefully avoids issues with infinite loops.
+
+    Add "VERBOSE_FROMPERLVER" to set $verbose in modules, print 
+    progress messages for debugging during install.
+
+    Remove leftover breakpoints.
+
+    Up module versions to v0.1.1.
+
+    Split re-used utils into M::FPV::Util.
+
 -   v0.5.5 Thu Mar 15 20:05:10 CDT 2018
 
     Fix make-sandbox-dir.

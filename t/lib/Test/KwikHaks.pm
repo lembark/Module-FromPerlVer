@@ -56,6 +56,8 @@ sub test_git_version
 
 sub search_bin
 {
+    # find only the first basename up the path from $Bin.
+
     my $base    = shift;
 
     my( $vol, $dir ) = splitpath $Bin, 1;
@@ -81,14 +83,10 @@ sub search_bin
     return
 }
 
-sub sandbox_path
-{
-    search_bin 'sandbox'
-}
-sub version_path
-{
-    search_bin 'version'
-}
+sub sandbox_path    { search_bin 'sandbox'          }
+sub version_path    { search_bin 'version'          }
+sub git_path        { search_bin 'sandbox/.git'     }
+sub tball_path      { search_bin 'sandbox/.git.tar' }
 
 sub write_version_file
 {

@@ -14,7 +14,7 @@ my $mm_ver = ExtUtils::MakeMaker->VERSION;
 ########################################################################
 
 my $path    = 'lib/Module/FromPerlVer.pm';
-my $version = '0.5.6'; 
+my $version = '0.5.7'; 
 
 ########################################################################
 # set up sandbox & version directory, generate dynamic tests

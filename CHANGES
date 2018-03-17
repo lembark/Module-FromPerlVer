@@ -1,3 +1,11 @@
+-   v0.5.7
+
+    Looking at it... probably want to search $Bin for git artifiacts
+    first before checkin cwd -- normal users will want to find items
+    relative to location of Makefile.PL rather than t/foobar. In most
+    cases only one will find something, makes more sense to search in
+    the users' order rather than for testing.
+
 -   v0.5.6
 
     Add META_MERGE into Makefile.PL for git (thanks to Jim Keenan).

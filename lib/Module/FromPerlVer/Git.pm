@@ -27,7 +27,7 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.1.1' )->numify;
+our $VERSION    = version->parse( 'v0.1.2' )->numify;
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my $nil         = sub{};
@@ -48,9 +48,9 @@ my @restore     = qw( git checkout  --theirs                    );
 my $search_for
 = sub
 {
-    &search_cwd 
-    or
     &search_bin
+    or
+    &search_cwd 
 };
 
 my @handlerz = 

@@ -8,6 +8,7 @@ for my $madness
 (
     qw
     (
+        Module::FromPerlVer::Util
         Module::FromPerlVer::Extract
         Module::FromPerlVer::Dir
         Module::FromPerlVer::Git

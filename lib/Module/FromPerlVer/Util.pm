@@ -7,6 +7,7 @@ use 5.006;
 use strict;
 
 use Carp    qw( croak           );
+use Cwd     qw( getcwd          );
 use FindBin qw( $Bin            );
 use Symbol  qw( qualify_to_ref  );
 
@@ -33,7 +34,9 @@ my  $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 my @exportz
 = qw
 (
+    search_dir
     search_bin
+    search_cwd
     find_libs
 );
 
@@ -44,13 +47,20 @@ my @exportz
 ########################################################################
 # yanked from FindBin::libs.
  
-sub search_bin
+sub search_dir
 {
-    my $base    = shift;
+    my $from    = shift
+    or croak "Bogus search_dir: false from dir";
+    my $base    = shift
+    or croak "Bogus search_dir: false basename";
 
-    my( $vol, $dir ) = splitpath $Bin, 1;
+    my( $vol, @dirz ) 
+    = do
+    {
+        my ( $v, $d ) = splitpath $from, 1;
 
-    my @dirz    = splitdir $dir;
+        ( $v => splitdir $d )
+    };
 
     # find all of the paths below the root.
     # 2 .. N avoids adding root dir's to the list.
@@ -67,15 +77,15 @@ sub search_bin
 
         -e $path
         ? $path
-        ()
+        : ()
     }
-    ( 2 .. @dirz );
+    ( 2 .. @dirz )
     or do
     {
         # normally the caller will warn if missing files.
         # use verbose to show alternates searched.
 
-        warn "Not found: '$base' ($Bin)"
+        warn "Not found: '$base' ($from)"
         if $verbose;
 
         return
@@ -87,6 +97,16 @@ sub search_bin
     wantarray
     ? @found
     : $found[0]
+}
+
+sub search_cwd
+{
+    search_dir getcwd(), @_
+}
+
+sub search_bin
+{
+    search_dir $Bin => @_
 }
 
 sub find_libs

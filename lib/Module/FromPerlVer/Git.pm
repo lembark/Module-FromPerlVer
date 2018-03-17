@@ -20,7 +20,7 @@ use Symbol                  qw( qualify_to_ref  );
 use Module::FromPerlVer::Util
 qw
 (
-    search_bin
+    search_cwd
 );
 
 ########################################################################
@@ -28,6 +28,7 @@ qw
 ########################################################################
 
 our $VERSION    = version->parse( 'v0.1.1' )->numify;
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my $nil         = sub{};
 
@@ -44,6 +45,14 @@ my @restore     = qw( git checkout  --theirs                    );
 # utility subs
 ########################################################################
 
+my $search_for
+= sub
+{
+    &search_cwd 
+    or
+    &search_bin
+};
+
 my @handlerz = 
 (
     # simplest case first, to more complicated.
@@ -51,7 +60,7 @@ my @handlerz =
 
     sub
     {
-        search_bin '.git'
+        $search_for->( '.git' )
     },
 
     sub
@@ -62,7 +71,7 @@ my @handlerz =
         my $tball   = $extract->value( 'git_tarball' )
         or return;
 
-        my $path    = search_bin $tball
+        my $path    = $search_for->( $tball )
         or die "Missing: '$tball' ($Bin)";
 
         print "# Extract repo from: '$path'";
@@ -94,11 +103,11 @@ my @handlerz =
         print STDERR "\n# Cloning from: '$url'\n";
 
         my $output  = qx{ $cmd };
-        if( my $error  = $? )
+        if( my $err  = $? )
         {
             die <<END
 
-    Non-zero:   '$status'.
+    Non-zero:   '$err'.
     Executing:  '$cmd'.
     Cloning:    '$url'."
     Output:
@@ -141,8 +150,6 @@ sub source_prefix
 
 sub module_sources
 {
-$DB::single = 1;
-
     my $extract = shift;
 
     # whichever one returns indicates that there is a 
@@ -187,8 +194,6 @@ sub source_files
 
 sub get_files
 {
-$DB::single = 1;
-
     my $extract = shift;
     my $tag     = $extract->value( 'module_source' );
 

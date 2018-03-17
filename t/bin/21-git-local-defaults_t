@@ -44,7 +44,7 @@ SKIP:
 
     local $ENV{ PERL_VERSION } = $perl_v;
 
-    use_ok $madness => qw( use_git 1 )
+    use_ok $madness => qw( use_git 1 git_tarball .git.tar )
     or BAIL_OUT "$madness is not usable.";
 
     my $prefix  = $madness->source_prefix;

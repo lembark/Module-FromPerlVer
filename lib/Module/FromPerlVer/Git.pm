@@ -20,6 +20,7 @@ use Symbol                  qw( qualify_to_ref  );
 use Module::FromPerlVer::Util
 qw
 (
+    search_bin
     search_cwd
 );
 
@@ -48,9 +49,9 @@ my @restore     = qw( git checkout  --theirs                    );
 my $search_for
 = sub
 {
-    &search_bin
+    search_cwd( @_ )
     or
-    &search_cwd 
+    search_bin( @_ )
 };
 
 my @handlerz = 

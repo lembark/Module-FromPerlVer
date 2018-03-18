@@ -70,7 +70,7 @@ sub search_dir
     {
         my $path    = catpath( $vol, catdir( @dirz ), $base );
 
-        print "#  Test '$base': '$path'.\n"
+        print "#  Test '$base': '$path'."
         if $verbose;
 
         pop @dirz;

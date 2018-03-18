@@ -51,7 +51,7 @@ sub test_git_version
 
     print "# git version: '$git'.\n";
 
-    1
+    $git
 }
 
 sub search_bin

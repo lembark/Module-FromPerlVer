@@ -1,3 +1,11 @@
+-   v0.5.9
+
+    Add output to Makefile.PL, try to figure out why version directory
+    is not being produced.
+
+    Added boilerplate to t/bin/make-* without add'l output. Someday
+    these might even work...
+
 -   v0.5.8
 
     Replace /bin/env with /usr/bin/env as possibly the only thing with a 

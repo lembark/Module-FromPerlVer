@@ -75,7 +75,7 @@ SKIP:
             die "No prefix: '$prefix' in '$found'.\n";
         };
 
-        my $v_rx    = qr{ $prefix ([\d._]+) \b }x;
+        my $v_rx    = qr{ $prefix (v?[\d._]+) \b }x;
 
         if
         (

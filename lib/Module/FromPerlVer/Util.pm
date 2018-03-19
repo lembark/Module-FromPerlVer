@@ -5,11 +5,13 @@
 package Module::FromPerlVer::Util;
 use 5.006;
 use strict;
+use version;
 
-use Carp    qw( croak           );
-use Cwd     qw( getcwd          );
-use FindBin qw( $Bin            );
-use Symbol  qw( qualify_to_ref  );
+use Carp            qw( croak           );
+use Cwd             qw( getcwd          );
+use File::Basename  qw( dirname         );
+use FindBin         qw( $Bin            );
+use Symbol          qw( qualify_to_ref  );
 
 use File::Spec::Functions
 qw
@@ -26,7 +28,7 @@ require lib;
 # package variables
 ########################################################################
 
-our $VERSION    = '0.001000';
+our $VERSION    = version->parse( '0.2.0' )->numify;
 our @CARP_NOT   = ( __PACKAGE__ );
 
 my  $verbose     = $ENV{ VERBOSE_FROMPERLVER };
@@ -63,7 +65,13 @@ sub search_dir
     };
 
     # find all of the paths below the root.
-    # 2 .. N avoids adding root dir's to the list.
+    # n-1 avoids adding root dir's to the list.
+
+    my $n   
+    = '.' eq $dirz[0]
+    ? @dirz
+    : @dirz - 1
+    ;
 
     my @found
     = map
@@ -79,7 +87,7 @@ sub search_dir
         ? $path
         : ()
     }
-    ( 2 .. @dirz )
+    ( 1 .. $n )
     or do
     {
         # normally the caller will warn if missing files.
@@ -106,8 +114,56 @@ sub search_cwd
 
 sub search_bin
 {
-    search_dir $Bin => @_
+    search_dir $Bin,     @_
 }
+
+sub search_for
+{
+    # this is normally used within Makefile.PL, at which point
+    # search_bin and search_cwd yield the same result. tesing
+    # may yield different results from ./t as $Bin: search it 
+    # first.
+
+    my $base    = shift;
+
+    -e $base
+    and return $base;
+
+    # if bin is below cwd then only search
+    # from bin through cwd.
+
+    my $bin     = $Bin;
+    my $cwd     = getcwd;
+
+    my @dirz   
+    = do
+    {
+        if( index $bin, $cwd )
+        {
+            # bin isn't below cwd: search them both
+
+            ( $bin, $cwd )
+        }
+        else
+        {
+
+            substr $bin, 0, length $cwd, '';
+
+            ( '.' . $bin )
+        }
+    };
+
+    my $path    = '';
+
+    for my $dir ( @dirz )
+    {
+        $path = search_dir $dir => $base
+        and return $path;
+    }
+
+    return
+}
+
 
 sub find_libs
 {

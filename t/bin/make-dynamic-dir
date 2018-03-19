@@ -10,15 +10,25 @@ use File::Basename  qw( basename dirname    );
 use List::MoreUtils qw( zip                 );
 use List::Util      qw( pairs pairmap       );
 
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
+use Test::KwikHaks;
+
 ########################################################################
 # package variables
 ########################################################################
 
-my $dir = ( dirname $0 ) . '/..';
-my $dyn = "$dir/dynamic";
+$\      = "\n";
 
--d $dyn || mkdir $dyn => 0770
-or die "Failed mkdir: '$dyn', $!";
+my $md  = Test::KwikHaks->can( 'mkdir_if' )
+or die "Botched Test::KwikHaks: cannot 'mkdir_if'.\n";
+
+my $glob    = '../bin/*_t';
+
+my $work_d  = dirname $Bin;
+my $dyn_b   = 'dynamic';
+
+$work_d     = $md->( $work_d => $dyn_b );
 
 my @v_stringz
 = do
@@ -65,12 +75,18 @@ my @v_stringz
 # symlink all of the test templates to version-specific paths.
 ########################################################################
 
-chdir $dyn
-or die "Failed chdir: $dir, $!";
+chdir $work_d
+or die "Failed chdir: $work_d, $!";
 
-for my $path ( glob "../bin/*_t" )
+my @testz   = glob $glob
+or die "Botched $0: no files like '$glob'.\n";
+
+print join "\n#\t" => '# Tests:', @testz;
+print join "\n#\t" => '# Versions:', @v_stringz;
+
+for my $path ( @testz )
 {
-    print "# Link: '$path'\n";
+    print "Link: '$path'.";
     
     my $base    = basename $path => '_t';
     my $pref    
@@ -80,7 +96,7 @@ for my $path ( glob "../bin/*_t" )
         substr $base, 0, $i;
     };
 
-    print "# Cleanup: '$pref-*'\n";
+    print "Cleanup: '$pref-*'.";
 
     unlink "$pref-*.t";
 

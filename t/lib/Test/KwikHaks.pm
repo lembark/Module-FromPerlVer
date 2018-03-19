@@ -126,5 +126,25 @@ sub write_version_file
     }
 }
 
+sub mkdir_if
+{
+    my $path = catdir @_;
+
+    print STDERR "mkdir_if: '$path'";
+
+    -d $path            ? print STDERR "Existing: '$path'."
+    : mkdir $path, 0777 ? print STDERR "Created: '$path'."
+    : die "Failed mkdir: '$path', $!.\n"
+    ;
+
+    # no telling what umask or other things are doing to
+    # the stats. just set it outright here.
+
+    chmod 0700, $path
+    or die "Failed chmod: '$path', $!.\n";
+
+    $path
+}
+
 1
 __END__

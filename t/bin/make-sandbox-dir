@@ -14,21 +14,13 @@ my $sand_d  = "t/sandbox";
 my $git_d   = "$sand_d/.git";
 my $tball   = "$git_d.tar";
 
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
+
 ########################################################################
 # generate the ./git directory with version tags.
 ########################################################################
 
-for( qx{git --version} )
-{
-    if( my $status = $? )
-    {
-        print "git --version returns $?, git tests will be skipped.\n";
-    }
-    else
-    {
-        print "Git version: '$_'";
-    }
-}
+test_git_version;
 
 if( -d $git_d )
 {
@@ -36,6 +28,11 @@ if( -d $git_d )
 }
 elsif( -e $tball )
 {
+    # make this all show up.
+
+    select *STDERR
+    if $verbose;
+
     print "Recover $git_d using '$tball'.\n";
 
     my $tar = Archive::Tar->new;
@@ -53,13 +50,17 @@ elsif( -e $tball )
         1
     }
     ? print "Prepared sandbox: '$git_d'\n"
-    : print "Failed extract: Git.pm tests will be skipped\n$@\n"
+    : warn "Failed extract: Git.pm tests will be skipped\n$@\n"
     ;
+}
+elsif( -d $sand_d )
+{
+    warn "Botched distribution: missing '$sand_d'.\n";
 }
 else
 {
-    print "Missing sandbox: $git_d\n";
-    print "Git.pm tests will skip: missing '$git_d' and '$tball'.\n";
+    warn "Missing sandbox: $git_d\n";
+    warn "Git.pm tests will skip: missing '$git_d' and '$tball'.\n";
 }
 
 # this isn't a module

@@ -20,15 +20,14 @@ use Symbol                  qw( qualify_to_ref  );
 use Module::FromPerlVer::Util
 qw
 (
-    search_bin
-    search_cwd
+    search_for
 );
 
 ########################################################################
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.1.2' )->numify;
+our $VERSION    = version->parse( 'v0.2.0' )->numify;
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my $nil         = sub{};
@@ -46,13 +45,6 @@ my @restore     = qw( git checkout  --theirs                    );
 # utility subs
 ########################################################################
 
-my $search_for
-= sub
-{
-    search_cwd( @_ )
-    or
-    search_bin( @_ )
-};
 
 my @handlerz = 
 (
@@ -61,7 +53,7 @@ my @handlerz =
 
     sub
     {
-        $search_for->( '.git' )
+        search_for '.git'
     },
 
     sub
@@ -72,8 +64,8 @@ my @handlerz =
         my $tball   = $extract->value( 'git_tarball' )
         or return;
 
-        my $path    = $search_for->( $tball )
-        or die "Missing: '$tball' ($Bin)";
+        my $path    = search_for $tball
+        or die "Missing: '$tball'";
 
         print "# Extract repo from: '$path'";
 

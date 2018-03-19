@@ -3,14 +3,24 @@
 # housekeeping
 ########################################################################
 
+BEGIN
+{
+    $\  = "\n";
+
+    print STDERR "Execute: '$0'.";
+}
+
 use 5.6.0;
 use strict;
 
 use version;
 
+use Test::More;
+
 use Cwd                 qw( getcwd          );
 use FindBin             qw( $Bin            );
 use File::Basename      qw( dirname         );
+use File::Find          qw( finddepth       );
 use List::Util          qw( pairmap uniq    );
 use List::MoreUtils     qw( zip             );
 
@@ -21,15 +31,22 @@ qw
     &catdir
 );
 
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
+use Test::KwikHaks;
+
 ########################################################################
 # package variables
 ########################################################################
 
 $\    = "\n";
 
-my $verbose = $ENV{ VERBOSE } || '';
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
-my $v_root  = 'version';
+my $v_base  = 'version';
+
+my $md  = Test::KwikHaks->can( 'mkdir_if' )
+or die "Botched Test::KwikHaks: cannot 'mkdir_if'.\n";
 
 my @v_stringz
 = do
@@ -117,19 +134,6 @@ END
 # utility subs
 ########################################################################
 
-sub mkdir_if
-{
-    my $path = catdir @_;
-
-    -d $path
-    or
-    mkdir $path, 0777
-    or 
-    die "Failed mkdir: '$path', $!\n";
-
-    $path
-}
-
 sub open_path
 {
     my $path    = catpath '' => @_;
@@ -156,7 +160,7 @@ sub make_v_file
     my $text    = sprintf $format => $name, $use, $ver;
 
     print $fh $text
-    or die "Failed print: '$base', $!\n";
+    or die "Failed print: '$base', $!n";
 
     close $fh
     or die "Failed close: '$base', $!\n";
@@ -167,31 +171,39 @@ sub make_v_file
 # version and Bar.pm having "no" version, etc/version.dat having
 # the version for comparision.
 
+$DB::single = 1;
+
 # i.e., start in ./t
 
-chdir dirname $Bin
-or die "Failed chdir: $!";
+my $work_d  = dirname $Bin;
 
-mkdir_if $v_root;
+chdir $work_d
+or die "Failed chdir: $!.\n";
 
-print '# Working directory: ' . getcwd;
+print STDERR 'Working directory: ' . getcwd;
+
+$work_d     = $md->( $work_d, $v_base )
+or die "Failed mkdir: '$v_base', $!.\n";
+
+chdir $work_d
+or die "Failed chdir: '$work_d', $!";
 
 for my $v_string ( @v_stringz )
 {
     eval
     {
-        my $v_dir   = mkdir_if $v_root => $v_string;
+        my $vers_d  = $md->( "./$v_string" );
 
-        print "# Version dir: '$v_dir'"
+        print "Version dir: '$vers_d'"
         if $verbose;
 
         for( @file_specz )
         {
             my ( $sub, $ext, $format ) = @$_;
 
-            my $v_sub   = mkdir_if $v_dir, $sub;
+            my $v_sub   = $md->( $vers_d, $sub );
 
-            print "# Subdir: '$v_sub'"
+            print "Subdir: '$v_sub'"
             if $verbose;
 
             for( @mod_specz )
@@ -200,7 +212,7 @@ for my $v_string ( @v_stringz )
 
                 my $base    = "$name.$ext";
 
-                print "# Generate: '$base'"
+                print "Generate: '$base'"
                 if $verbose;
 
                 make_v_file $v_string, $v_sub, $base, $name, $use, $format;
@@ -211,6 +223,8 @@ for my $v_string ( @v_stringz )
     }
     or warn;
 }
+
+done_testing;
 
 # this is not a module
 0

@@ -7,42 +7,57 @@ use strict;
 use version;
 
 use ExtUtils::MakeMaker;
-my $mm_ver = ExtUtils::MakeMaker->VERSION;
 
 ########################################################################
 # package variables
 ########################################################################
 
-my $path    = 'lib/Module/FromPerlVer.pm';
-my $version = '0.5.6'; 
+$\          = "\n";
+
+my $module  = 'lib/Module/FromPerlVer.pm';
+my $version = '0.6.0'; 
+
+my $perl    = $^X;
 
 ########################################################################
 # set up sandbox & version directory, generate dynamic tests
 ########################################################################
 
-system "rm -rf ./t/version t/dynamic t/sandbox/.git"
-and print "Failed rm: '$?' ($!)";
-
-for my $base 
-(
-    qw
-    (
-        make-version-dir
-        make-sandbox-dir
-        make-tests
-    )
-)
+print STDERR join "\n# " => "Exeucte with perl: '$perl'", 
+map
 {
-    my $path    = "t/bin/$base";
+    local $ENV{ VERBOSE_FROMPERLVER } = 1;
+    local *STDOUT   = *STDERR;
 
-    print "Setup: '$path'";
+    if( -x )
+    {
+        print "Execute: '$perl $_'";
 
-    system "/bin/env perl $path";
-    my $err = $!;
+        my $output  = qx{ "$_" };
+        my $exit    = $?;
+        my $err     = $!;
 
-    print "$path fails: $err"
-    if $err;
+        (
+            "Setup: '$_'" =>
+            $exit
+            ? "Failed: non-zero exit: '$_', $exit, $err"
+            : "Sucess: '$_' ($exit)"
+        )
+    }
+    else
+    {
+        "Non-executable: '$_'";
+    }
 }
+glob "t/bin/make-*-dir";
+
+########################################################################
+# various things that may depend on the ExtUtils::MakeMaker version.
+# the main hash gets messy enough as it is, keep the logic for these
+# up here and just insert them into the write args, below.
+########################################################################
+
+my $mm_v    = ExtUtils::MakeMaker->VERSION;
 
 my @test_spec = 
 (
@@ -68,7 +83,7 @@ my @dist_spec =
 my @merge_spec
 = do
 {
-    if( $mm_ver < 6.46 )
+    if( $mm_v < 6.46 )
     {
         ()
     }
@@ -100,12 +115,12 @@ my @merge_spec
             },
         }
     }
- };
+};
 
 WriteMakefile
 (
     NAME            => 'Module::FromPerlVer',
-    ABSTRACT_FROM   => $path,
+    ABSTRACT_FROM   => $module,
     VERSION         => version->parse( $version )->numify,
     AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
     LICENSE         => 'perl',
@@ -120,7 +135,7 @@ WriteMakefile
 
 		qw
         (
-            Cwd                     3.73
+            Cwd                     3.073
 
             Archive::Tar            0
             Carp                    0
@@ -139,13 +154,11 @@ WriteMakefile
             version                 0
 
         ),
-
     },
 
     @dist_spec,
     @test_spec,
     @merge_spec,
-
 );
 
 __END__

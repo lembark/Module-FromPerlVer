@@ -34,12 +34,14 @@ SKIP:
     eval
     {
         use_ok $madness;
+
+        1
     }
-    or skip "Use failed: $@", 1;
+    or BAIL_OUT "Use failed: $@";
 
     for my $prefix ( $madness->source_prefix )
     {
-        my $expect  = './t/version';
+        my $expect  = 't/version';
 
         is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
     }

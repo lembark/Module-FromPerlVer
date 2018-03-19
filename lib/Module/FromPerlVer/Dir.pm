@@ -9,7 +9,7 @@ use version;
 use parent  qw( Module::FromPerlVer::Extract );
 
 use Carp                    qw( croak               );
-use Cwd                     qw( cwd                 );
+use Cwd                     qw( getcwd              );
 use File::Basename          qw( basename dirname    );
 use File::Copy::Recursive   qw( dircopy             );
 use File::Find              qw( find                );
@@ -25,11 +25,17 @@ qw
     &catdir
 );
 
+use Module::FromPerlVer::Util
+qw
+(
+    search_for
+);
+
 ########################################################################
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.1.1' )->numify;
+our $VERSION    = version->parse( 'v0.2.0' )->numify;
 our @CARP_NOT   = ( __PACKAGE__ );
 
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
@@ -38,37 +44,6 @@ my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 # utility subs
 ########################################################################
 
-my $search_bin
-= sub
-{
-    my $base    = shift;
-
-    my( $vol, $dir ) = splitpath $Bin, 1;
-
-    print "#  Search for: '$base' ('$vol' '$dir')"
-    if $verbose;
-
-    for
-    (
-        my @dirz    = splitdir $dir
-        ;
-        @dirz > 1
-        ;
-        pop @dirz
-    )
-    {
-        my $path    = catpath $vol, ( catdir @dirz ), $base;
-
-        print "#  Check: '$path'"
-        if $verbose;
-
-        -e $path
-        and return $path;
-    }
-
-    croak "Bogus source_prefix: no '$base' in or above '$Bin'";
-};
-
 ########################################################################
 # methods
 ########################################################################
@@ -76,7 +51,7 @@ my $search_bin
 sub source_prefix
 {
     my $extract = shift;
-    my $dir     = $extract->{ version_dir }
+    my $dir     = $extract->value( 'version_dir' )
     or die "Bogus source_prefix: false 'version_dir'";
 
     print "#  Prefix from: '$dir'"
@@ -88,9 +63,9 @@ sub source_prefix
     my $path
     = -e $dir
     ? $dir
-    : $search_bin->( $dir )
+    : search_for $dir
     or
-    die "Botched source_prefix: non-existent '$dir' ($Bin).\n";
+    die "Botched source_prefix: non-existent '$dir'.\n";
 
     print "#  Source dir: '$path'"
     if $verbose;
@@ -98,26 +73,9 @@ sub source_prefix
     # in any case, if we get this far the last stat was $path.
     # report any errors using the absolute path.
 
-    -d _        or die "Bogus version_prefix: non-dir      '$path'\n";
+    -d $path    or die "Bogus version_prefix: non-dir      '$path'\n";
     -r _        or die "Bogus version_prefix: non-readable '$path'\n";
     -x _        or die "Bogus version_prefix: non-execable '$path'\n";
-
-    for my $cwd ( cwd )
-    {
-        # convert $path to relative for easier viewing.
-
-        index $path, $cwd
-        or 
-        substr $path, 0, length( $cwd ), '.'
-    }
-
-    print "#  Relative: '$path'"
-    if $verbose;
-
-    # belt and suspenders.
-
-    -e $path
-    or croak "Bogus source_prefix: mis-handled '$path' ($dir).";
 
     my @found   = glob "$path/*"
     or die "Bogus version_prefix: '$path' is empty directory.\n";

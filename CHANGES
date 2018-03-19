@@ -1,10 +1,19 @@
--   v0.5.9
+-   v0.6.0 Sun Mar 18 22:20:49 CDT 2018
 
     Add output to Makefile.PL, try to figure out why version directory
     is not being produced.
 
     Added boilerplate to t/bin/make-* without add'l output. Someday
     these might even work...
+
+    Dir.pm uses search_bin then search_cwd to locate version & Git
+    dir's. Order makes more sense since Makefile.PL will be usual spot
+    for exection.
+
+    Push a bit more code into Util for re-use, push searches into 
+    range of $Bin .. cwd if bin is below cwd. Avoids searching up
+    large paths that aren't going to have anything useful in most
+    cases.
 
 -   v0.5.8
 

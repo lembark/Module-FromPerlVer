@@ -457,6 +457,10 @@ my @handlerz =
 
 sub import
 {
+# hack for force output during testing.
+my $fh = select STDERR;
+local $| = 1;
+
     local $\    = "\n";
 
     my $argz    = &$extract_args;
@@ -472,7 +476,11 @@ sub import
 
     $extract->value( 'no_copy' )
     or
-    get_files()
+    get_files();
+
+    select $fh;
+
+    return
 }
 
 # keep require happy

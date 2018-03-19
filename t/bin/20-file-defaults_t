@@ -20,54 +20,51 @@ my $v_dir   = 'version';
 
 note "Test sandbox: '$v_dir'";
 
-SKIP:
+my ( $base, $perl_v )  
+= eval
 {
-    my ( $base, $perl_v )  
-    = eval
-    {
-        Test::KwikHaks::perl_v_from_basename()
-    }
-    or BAIL_OUT "Missing Perl Version: $@";
-
-    local $ENV{ PERL_VERSION } = $perl_v;
-
-    eval
-    {
-        use_ok $madness;
-
-        1
-    }
-    or BAIL_OUT "Use failed: $@";
-
-    for my $prefix ( $madness->source_prefix )
-    {
-        my $expect  = 't/version';
-
-        is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
-    }
-
-    for my $found ( scalar $madness->source_files )
-    {
-        @$found
-        ? pass 'Found source files in version directory'
-        : fail 'Missing source files for cleanup'
-        ;
-
-        note "Source files:\n", explain $found;
-
-        ok -e , "Found: '$_'"
-        for @$found;
-    }
-
-    eval
-    {
-        $madness->cleanup;
-
-        pass "Survived cleanup.";
-    }
-    or 
-    fail "Failed cleanup: $@";
+    Test::KwikHaks::perl_v_from_basename()
 }
+or BAIL_OUT "Missing Perl Version: $@";
+
+local $ENV{ PERL_VERSION } = $perl_v;
+
+eval
+{
+    use_ok $madness;
+
+    1
+}
+or BAIL_OUT "Use failed: $@";
+
+for my $prefix ( $madness->source_prefix )
+{
+    my $expect  = 't/version';
+
+    is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
+}
+
+for my $found ( scalar $madness->source_files )
+{
+    @$found
+    ? pass 'Found source files in version directory'
+    : fail 'Missing source files for cleanup'
+    ;
+
+    note "Source files:\n", explain $found;
+
+    ok -e , "Found: '$_'"
+    for @$found;
+}
+
+eval
+{
+    $madness->cleanup;
+
+    pass "Survived cleanup.";
+}
+or 
+fail "Failed cleanup: $@";
 
 done_testing;
 __END__

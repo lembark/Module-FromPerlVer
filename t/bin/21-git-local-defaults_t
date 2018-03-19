@@ -37,10 +37,10 @@ SKIP:
     or skip "Git not available ($@)", 1;
 
     my $sandbox = Test::KwikHaks::sandbox_path()
-    or skip "Non-existant: 'sandbox'", 1;
+    or BAIL_OUT "Non-existant: 'sandbox'", 1;
 
     chdir $sandbox
-    or skip "Failed chdir: '$sandbox', $!", 1;
+    or BAIL_OUT "Failed chdir: '$sandbox', $!", 1;
 
     local $ENV{ PERL_VERSION } = $perl_v;
 

@@ -16,6 +16,8 @@ for my $madness
     )
 )
 {
+    diag "Verify: '$madness'";
+
     require_ok $madness
     or BAIL_OUT "$madness is not usable.";
 
@@ -26,6 +28,8 @@ for my $madness
     or BAIL_OUT "$madness cannot 'VERSION'", 1;
 
     my $ver = $madness->VERSION;
+
+    diag "Version: '$madness', $ver";
 
     ok $ver, "$madness has VERSION '$ver'";
 }

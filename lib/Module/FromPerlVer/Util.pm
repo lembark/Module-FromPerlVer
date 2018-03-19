@@ -28,7 +28,7 @@ require lib;
 # package variables
 ########################################################################
 
-our $VERSION    = version->parse( '0.2.0' )->numify;
+our $VERSION    = version->parse( '0.3.0' )->numify;
 our @CARP_NOT   = ( __PACKAGE__ );
 
 my  $verbose     = $ENV{ VERBOSE_FROMPERLVER };
@@ -48,7 +48,7 @@ my @exportz
 
 ########################################################################
 # yanked from FindBin::libs.
- 
+
 sub search_dir
 {
     my $from    = shift
@@ -56,7 +56,7 @@ sub search_dir
     my $base    = shift
     or croak "Bogus search_dir: false basename";
 
-    my( $vol, @dirz ) 
+    my( $vol, @dirz )
     = do
     {
         my ( $v, $d ) = splitpath $from, 1;
@@ -67,7 +67,7 @@ sub search_dir
     # find all of the paths below the root.
     # n-1 avoids adding root dir's to the list.
 
-    my $n   
+    my $n
     = '.' eq $dirz[0]
     ? @dirz
     : @dirz - 1
@@ -121,10 +121,12 @@ sub search_for
 {
     # this is normally used within Makefile.PL, at which point
     # search_bin and search_cwd yield the same result. tesing
-    # may yield different results from ./t as $Bin: search it 
+    # may yield different results from ./t as $Bin: search it
     # first.
 
     my $base    = shift;
+
+    # deal with the simplest case first.
 
     -e $base
     and return $base;
@@ -135,10 +137,17 @@ sub search_for
     my $bin     = $Bin;
     my $cwd     = getcwd;
 
-    my @dirz   
+    my @dirz
     = do
     {
-        if( index $bin, $cwd )
+        if( $bin eq $cwd )
+        {
+            # this will normally be the case, e.g., "perl Makefile.PL"
+            # will be using . for both.
+
+            ( $bin )
+        }
+        elsif( index $bin, $cwd )
         {
             # bin isn't below cwd: search them both
 
@@ -146,10 +155,9 @@ sub search_for
         }
         else
         {
+            substr $bin, 0, length $cwd, '.';
 
-            substr $bin, 0, length $cwd, '';
-
-            ( '.' . $bin )
+            ( $bin )
         }
     };
 
@@ -164,9 +172,10 @@ sub search_for
     return
 }
 
-
 sub find_libs
 {
+    # this will normally find ./t/lib & ./lib.
+
     my @dirz    = search_bin 'lib'
     or die "No libs found: '$Bin'\n";
 
@@ -184,7 +193,7 @@ sub import
     for my $name ( @_ ? @_ : @exportz )
     {
         *{ qualify_to_ref $name, $caller }
-        = __PACKAGE__->can( $name ) 
+        = __PACKAGE__->can( $name )
         or croak "Bogus Util: unknown '$name'";
     }
 }

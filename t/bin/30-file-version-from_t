@@ -34,56 +34,53 @@ my $madness = 'Module::FromPerlVer';
 
 delete $ENV{ PERL_VERSION };
 
-SKIP:
+my ( $base, $perl_v )  
+= eval
 {
-    my ( $base, $perl_v )  
-    = eval
-    {
-        Test::KwikHaks::perl_v_from_basename()
-    }
-    or BAIL_OUT "Missing Perl Version: $@";
-
-    my $v_file  = Test::KwikHaks::write_version_file( $perl_v )
-    or skip "Failed writing version file.", 1;
-
-    eval
-    {
-        my @argz    = ( use_dir => 1,  version_from => $v_file );
-
-        use_ok $madness => @argz
-    }
-    or BAIL_OUT "Use failed; $@", 1;
-
-    for my $prefix ( $madness->source_prefix )
-    {
-        my $expect  = 't/version';
-
-        is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
-    }
-
-    for my $found ( scalar $madness->source_files )
-    {
-        @$found
-        ? pass 'Acquired source files in version directory.'
-        : fail 'No source files for cleanup.'
-        ;
-
-        note "Source files:\n", explain $found;
-
-        ok -e , "Found: '$_'"
-        for @$found;
-    }
-
-    eval
-    {
-        $madness->cleanup;
-        unlink $v_file;
-
-        pass "Survived cleanup.";
-    }
-    or 
-    fail "Failed cleanup: $@";
+    Test::KwikHaks::perl_v_from_basename()
 }
+or BAIL_OUT "Missing Perl Version: $@";
+
+my $v_file  = Test::KwikHaks::write_version_file( $perl_v )
+or BAIL_OUT "Failed writing version file.", 1;
+
+eval
+{
+    my @argz    = ( use_dir => 1,  version_from => $v_file );
+
+    use_ok $madness => @argz
+}
+or BAIL_OUT "Use failed; $@", 1;
+
+for my $prefix ( $madness->source_prefix )
+{
+    my $expect  = 't/version';
+
+    is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
+}
+
+for my $found ( scalar $madness->source_files )
+{
+    @$found
+    ? pass 'Acquired source files in version directory.'
+    : fail 'No source files for cleanup.'
+    ;
+
+    note "Source files:\n", explain $found;
+
+    ok -e , "Found: '$_'"
+    for @$found;
+}
+
+eval
+{
+    $madness->cleanup;
+    unlink $v_file;
+
+    pass "Survived cleanup.";
+}
+or 
+fail "Failed cleanup: $@";
 
 done_testing;
 __END__

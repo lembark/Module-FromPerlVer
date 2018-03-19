@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.6.0'; 
+my $version = '0.6.1'; 
 
 my $perl    = $^X;
 
@@ -23,33 +23,29 @@ my $perl    = $^X;
 # set up sandbox & version directory, generate dynamic tests
 ########################################################################
 
-print STDERR join "\n# " => "Exeucte with perl: '$perl'", 
-map
+for my $path ( glob "t/bin/make-*-dir" )
 {
-    local $ENV{ VERBOSE_FROMPERLVER } = 1;
-    local *STDOUT   = *STDERR;
-
-    if( -x )
+    eval
     {
-        print "Execute: '$perl $_'";
+        -x $path    
+        or die "Non-executable: '$path'\n";
 
-        my $output  = qx{ "$_" };
-        my $exit    = $?;
-        my $err     = $!;
+        local $ENV{ VERBOSE_FROMPERLVER } = 1;
+        local *STDOUT   = *STDERR;
+        local $,        = "\n";
 
-        (
-            "Setup: '$_'" =>
-            $exit
-            ? "Failed: non-zero exit: '$_', $exit, $err"
-            : "Sucess: '$_' ($exit)"
-        )
+        print STDERR "Execute: '$path'";
+
+        my $output  = qx{ "$path" };
+
+        die "Failed: '$path', $? ($!)\n$output"
+        if $?;
+
+        print "Success: '$path'"
     }
-    else
-    {
-        "Non-executable: '$_'";
-    }
+    or
+    warn;
 }
-glob "t/bin/make-*-dir";
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.
@@ -142,17 +138,20 @@ WriteMakefile
             File::Basename          0
             File::Copy::Recursive   0
             File::Find              0
+            File::Spec::Functions   0
             FindBin                 0
             List::MoreUtils         0
             List::Util              0
             NEXT                    0
             Scalar::Util            0
             Symbol                  0
+            Test::Deep              0
             Test::More              0
+            lib                     0
             parent                  0
             strict                  0
             version                 0
-
+            warnings                0
         ),
     },
 

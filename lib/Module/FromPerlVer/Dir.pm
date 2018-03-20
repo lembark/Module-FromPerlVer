@@ -35,7 +35,7 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.2.0' )->numify;
+our $VERSION    = version->parse( 'v0.3.0' )->numify;
 our @CARP_NOT   = ( __PACKAGE__ );
 
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };

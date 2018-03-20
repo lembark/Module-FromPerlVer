@@ -35,22 +35,5 @@ for my $madness
     diag "Version: '$madness', $ver";
 }
 
-for my $dir
-(
-    qw
-    (
-        t/version
-        t/dynamic
-        t/sandbox
-    )
-)
-{
-    ok -d $dir, "Found: '$dir'";
-
-    my @filz    = ( glob( "$dir/*" ), glob( "$dir/.[a-z]*" ) );
-
-    diag join "\n" => "Dir contents: '$dir'", explain \@filz;
-}
-
 done_testing;
 __END__

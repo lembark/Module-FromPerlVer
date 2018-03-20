@@ -31,7 +31,7 @@ or die "Botched Test::KwikHaks: cannot 'rm_rf'.\n";
 
 my $glob    = '../bin/*_t';
 
-my $work_d  = dirname( $Bin );
+my $work_d  = "$Bin/..";
 my $d_base  = 'dynamic';
 
 ########################################################################

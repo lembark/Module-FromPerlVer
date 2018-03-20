@@ -10,7 +10,7 @@ use Archive::Tar;
 # package variables 
 ########################################################################
 
-my $sand_d  = "t/sandbox";
+my $sand_d  = "sandbox";
 my $git_d   = "$sand_d/.git";
 my $tball   = "$git_d.tar";
 

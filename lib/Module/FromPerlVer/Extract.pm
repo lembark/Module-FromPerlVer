@@ -15,7 +15,7 @@ use Scalar::Util    qw( blessed );
 # package variables
 ########################################################################
 
-our $VERSION    = version->parse( '0.1' )->numify;
+our $VERSION    = version->parse( '0.2' )->numify;
 
 ########################################################################
 # methods

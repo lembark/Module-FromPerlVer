@@ -122,7 +122,7 @@ sub make_v_file
 
 # i.e., start in ./t
 
-my $work_d  = dirname $Bin;
+my $work_d  = "$Bin/../..";
 
 chdir $work_d
 or die "Failed chdir: $!.\n";

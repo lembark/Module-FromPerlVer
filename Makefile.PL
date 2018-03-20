@@ -15,11 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.7.0'; 
-
-########################################################################
-# set up sandbox & version directory, generate dynamic tests
-########################################################################
+my $version = '0.8.0'; 
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.
@@ -37,18 +33,18 @@ my @test_spec =
     }
 );
 
-my @dist_spec =
-(
-    dist =>
-    {
-        # the local_repo.tar is *not* in the MANIFEST.
-        # it is used here for validating the POD
-        # telling people how to make a tarball.
-
-        PREOP =>
-        q{ cd t/sandbox/ && /bin/tar cvf .git.tar .git },
-    }
-);
+my @dist_spec = ();
+#(
+#    dist =>
+#    {
+#        # the local_repo.tar is *not* in the MANIFEST.
+#        # it is used here for validating the POD
+#        # telling people how to make a tarball.
+#
+#        PREOP =>
+#        q{ cd sandbox/ && /bin/tar cvf .git.tar .git },
+#    }
+#);
 
 my @merge_spec
 = do

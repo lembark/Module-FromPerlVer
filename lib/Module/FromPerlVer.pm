@@ -26,7 +26,7 @@ use Module::FromPerlVer::Git;
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( '0.2.0' )->numify;
+our $VERSION    = version->parse( '0.3.0' )->numify;
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my %defaultz = 

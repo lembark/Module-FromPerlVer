@@ -28,6 +28,8 @@ use Test::KwikHaks;
 
 my $madness = 'Module::FromPerlVer';
 
+my $wv      = Test::KwikHaks->can( 'write_version_file' );
+
 ########################################################################
 # test reading version from "use" or "no".
 ########################################################################
@@ -41,7 +43,7 @@ my ( $base, $perl_v )
 }
 or BAIL_OUT "Missing Perl Version: $@";
 
-my $v_file  = Test::KwikHaks::write_version_file( $perl_v )
+my $v_file  = $wv->( $perl_v )
 or BAIL_OUT "Failed writing version file.", 1;
 
 eval
@@ -54,7 +56,7 @@ or BAIL_OUT "Use failed; $@", 1;
 
 for my $prefix ( $madness->source_prefix )
 {
-    my $expect  = 't/version';
+    my $expect  = 'version';
 
     is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
 }

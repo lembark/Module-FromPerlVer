@@ -39,9 +39,7 @@ or BAIL_OUT "Use failed: $@";
 
 for my $prefix ( $madness->source_prefix )
 {
-    my $expect  = 't/version';
-
-    is $prefix, $expect, "Source prefix: '$prefix' ($expect)";
+    is $prefix, $v_dir, "Source prefix: '$prefix' ($v_dir)";
 }
 
 for my $found ( scalar $madness->source_files )

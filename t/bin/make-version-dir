@@ -3,26 +3,15 @@
 # housekeeping
 ########################################################################
 
-BEGIN
-{
-    $\  = "\n";
-
-    print STDERR "Execute: '$0'.";
-}
-
 use 5.6.0;
 use strict;
 
 use version;
 
-use Test::More;
-
 use Cwd                 qw( getcwd          );
 use FindBin             qw( $Bin            );
 use File::Basename      qw( dirname         );
 use File::Find          qw( finddepth       );
-use List::Util          qw( pairmap uniq    );
-use List::MoreUtils     qw( zip             );
 
 use File::Spec::Functions
 qw
@@ -41,57 +30,17 @@ use Test::KwikHaks;
 
 $\    = "\n";
 
-my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
-
-my $v_base  = 'version';
-
 my $md  = Test::KwikHaks->can( 'mkdir_if' )
 or die "Botched Test::KwikHaks: cannot 'mkdir_if'.\n";
 
-my @v_stringz
-= do
-{
-    my @versionz 
-    = qw
-    (
-        5.0.1
-        5.6.0
-        5.8.8
-        5.888.888
-        5.999.999
-    );
+my $gv  = Test::KwikHaks->can( 'generate_versions' )
+or die "Botched Test::KwikHaks: cannot 'generate_versions'.\n";
 
-    my @formatz
-    = qw
-    (
-        %d.%d.%d
-        %d.%03d%03d
-        %d.%03d.%03d
-        %d.%03d_%03d
-    );
+my $rm  = Test::KwikHaks->can( 'rm_rf' )
+or die "Botched Test::KwikHaks: cannot 'rm_rf'.\n";
 
-    # lexical sort works.
-
-    uniq
-    sort
-    map
-    {
-        (
-            $_, "v$_"
-        )
-    }
-    pairmap
-    {
-        sprintf $a => @$b
-    }
-    map
-    {
-        my @v   = ( [ split /\W/ ] ) x @formatz;
-
-        zip @formatz, @v
-    }
-    @versionz;
-};
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
+my $v_base      = 'version';
 
 my @mod_specz = 
 (
@@ -171,8 +120,6 @@ sub make_v_file
 # version and Bar.pm having "no" version, etc/version.dat having
 # the version for comparision.
 
-$DB::single = 1;
-
 # i.e., start in ./t
 
 my $work_d  = dirname $Bin;
@@ -182,13 +129,15 @@ or die "Failed chdir: $!.\n";
 
 print STDERR 'Working directory: ' . getcwd;
 
+$rm->( $v_base );
+
 $work_d     = $md->( $work_d, $v_base )
 or die "Failed mkdir: '$v_base', $!.\n";
 
 chdir $work_d
 or die "Failed chdir: '$work_d', $!";
 
-for my $v_string ( @v_stringz )
+for my $v_string ( $gv->() )
 {
     eval
     {
@@ -223,8 +172,6 @@ for my $v_string ( @v_stringz )
     }
     or warn;
 }
-
-done_testing;
 
 # this is not a module
 0

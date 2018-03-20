@@ -15,37 +15,11 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.6.1'; 
-
-my $perl    = $^X;
+my $version = '0.7.0'; 
 
 ########################################################################
 # set up sandbox & version directory, generate dynamic tests
 ########################################################################
-
-for my $path ( glob "t/bin/make-*-dir" )
-{
-    eval
-    {
-        -x $path    
-        or die "Non-executable: '$path'\n";
-
-        local $ENV{ VERBOSE_FROMPERLVER } = 1;
-        local *STDOUT   = *STDERR;
-        local $,        = "\n";
-
-        print STDERR "Execute: '$path'";
-
-        my $output  = qx{ "$path" };
-
-        die "Failed: '$path', $? ($!)\n$output"
-        if $?;
-
-        print "Success: '$path'"
-    }
-    or
-    warn;
-}
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.

@@ -1,3 +1,16 @@
+-   v0.7.0 Mon Mar 19 21:34:25 CDT 2018
+    
+    More test code pushed into KwikHaks.
+    More boilerplate.
+
+    Replaced execution of dynamic file generation with generated 
+    MANIFEST that has all of the dynamic content in it. This 
+    passes "make test" here on an extracted copy of the tarball.
+    This leaves me with a 1000+ line MANIFEST but lacking output
+    from the original Makfile.PL execution there is no way to 
+    tell what is killing the make-*-dir execution on about half
+    of the systems.
+
 -   v0.6.1 Mon Mar 19 12:50:30 CDT 2018
 
     One-time-hak of selecting STDERR in order to see output in failing tests

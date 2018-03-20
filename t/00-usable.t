@@ -4,10 +4,13 @@ use Test::More;
 use Archive::Tar;
 use File::Basename  qw( basename );
 
+use lib qw( lib t/lib );
+
 for my $madness
 (
     qw
     (
+        Test::KwikHaks
         Module::FromPerlVer::Util
         Module::FromPerlVer::Extract
         Module::FromPerlVer::Dir
@@ -16,22 +19,37 @@ for my $madness
     )
 )
 {
-    diag "Verify: '$madness'";
-
     require_ok $madness
     or BAIL_OUT "$madness is not usable.";
 
-    # verify that the package is spelled properly,
-    # that a version is installed.
+    # simple check: is there any method to the madness?
+    # true => package is probably spelled correctly.
 
     ok $madness->can( 'VERSION' ), "$madness can 'VERSION'"
     or BAIL_OUT "$madness cannot 'VERSION'", 1;
 
     my $ver = $madness->VERSION;
 
-    diag "Version: '$madness', $ver";
-
     ok $ver, "$madness has VERSION '$ver'";
+
+    diag "Version: '$madness', $ver";
+}
+
+for my $dir
+(
+    qw
+    (
+        t/version
+        t/dynamic
+        t/sandbox
+    )
+)
+{
+    ok -d $dir, "Found: '$dir'";
+
+    my @filz    = ( glob( "$dir/*" ), glob( "$dir/.[a-z]*" ) );
+
+    diag join "\n" => "Dir contents: '$dir'", explain \@filz;
 }
 
 done_testing;

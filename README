@@ -55,6 +55,11 @@ way, the versioning should be straightforward to maintain. The
 biggest hurdle is overcoming muscle-memory to edit files under
 ./lib that are going to be overwritten.
 
+Note that the #! code here uses "#!/usr/bin/env". Some linux 
+distros use "/usr/bin" but the stock path in GNU releases and
+BSD is /usr/bin with a symlink or copy in /bin. Using the stock
+path allows things to run, which seems preferable.
+
 Notes to anyone editing the module:
 
 t/bin/make-*-dir & t/bin/make-tests will set up the test environment

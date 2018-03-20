@@ -8,7 +8,7 @@ use strict;
 
 use File::Basename  qw( basename dirname    );
 use List::MoreUtils qw( zip                 );
-use List::Util      qw( pairs pairmap       );
+use List::Util      qw( pairmap             );
 
 use FindBin qw( $Bin );
 use lib "$Bin/../lib";
@@ -23,66 +23,37 @@ $\      = "\n";
 my $md  = Test::KwikHaks->can( 'mkdir_if' )
 or die "Botched Test::KwikHaks: cannot 'mkdir_if'.\n";
 
+my $gv  = Test::KwikHaks->can( 'generate_versions' )
+or die "Botched Test::KwikHaks: cannot 'generate_versions'.\n";
+
+my $rm  = Test::KwikHaks->can( 'rm_rf' )
+or die "Botched Test::KwikHaks: cannot 'rm_rf'.\n";
+
 my $glob    = '../bin/*_t';
 
-my $work_d  = dirname $Bin;
-my $dyn_b   = 'dynamic';
-
-$work_d     = $md->( $work_d => $dyn_b );
-
-my @v_stringz
-= do
-{
-    my @test_verz
-    = qw
-    (
-        5.5.3
-        5.888.888
-        5.999.999
-    );
-
-    my @formatz
-    = map
-    {
-        (   $_, 'v' . $_ )
-    }
-    qw
-    (
-        %d.%d.%d
-        %d.%03d.%03d
-        %d.%03d%03d
-        %d.%03d_%03d
-    );
-
-    sort
-    {
-        $a cmp $b
-    }
-    pairmap
-    {
-        sprintf $a => @$b
-    }
-    map
-    {
-        my @valz    = ( [ split /\D/ ] ) x @formatz;
-
-        zip @formatz, @valz
-    }
-    @test_verz;
-};
+my $work_d  = dirname( $Bin );
+my $d_base  = 'dynamic';
 
 ########################################################################
 # symlink all of the test templates to version-specific paths.
 ########################################################################
 
+# two-step chdir and rm avoids stale tests.
+
 chdir $work_d
 or die "Failed chdir: $work_d, $!";
+
+$rm->( $d_base );
+
+$md->( $work_d => $d_base );
+
+chdir $d_base
+or die "Failed chdir: '$d_base', $!";
 
 my @testz   = glob $glob
 or die "Botched $0: no files like '$glob'.\n";
 
 print join "\n#\t" => '# Tests:', @testz;
-print join "\n#\t" => '# Versions:', @v_stringz;
 
 for my $path ( @testz )
 {
@@ -96,12 +67,40 @@ for my $path ( @testz )
         substr $base, 0, $i;
     };
 
+    # this might return false if there were no links, can't
+    # really check it until the individual links are made --
+    # that or a glob-and-loop checking each one which seems
+    # like overkill...
+
     print "Cleanup: '$pref-*'.";
 
     unlink "$pref-*.t";
 
-    symlink $path => "$base-$_.t"
-    for @v_stringz;
+    for my $perl_v ( $gv->() )
+    {
+        my $link    = "$base-$perl_v.t";
+
+        print "Symlink: $link";
+
+        # no telling if the previous unlink might have
+        # failed for some offball reason...
+
+        if( -e $link )
+        {
+            unlink $link
+            or
+            warn "Failed unlink: '$link', $!";
+        }
+
+        symlink $path => $link
+        or warn "Failed symlink: '$link', $!";
+
+        -e $link
+        or warn "Missing link: '$link',";
+
+        -l $link
+        or warn "Non-link: '$link',";
+    }
 }
 
 exit 0;

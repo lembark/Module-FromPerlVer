@@ -1,0 +1,112 @@
+#!/usr/bin/env perl
+
+use v5.24;
+use lib 't/lib';
+
+use File::Find  qw( find    );
+
+for my $glob ( "t/bin/make-*-dir" )
+{
+    local $ENV{ VERBOSE_FROMPERLVER } = 1;
+    local *STDOUT   = *STDERR;
+    local $,        = "\n";
+
+    print "Searching for setup: '$glob'\n";
+
+    if( my @pathz = glob $glob )
+    {
+        print join "\n\t" => 'Setup paths:', @pathz;
+
+        for my $path ( @pathz )
+        {
+            eval
+            {
+                -x $path    
+                or die "Non-executable: '$path'\n";
+
+                print "Execute: '$path'\n";
+
+                my $output  = qx{ "$path" };
+
+                die "Failed: '$path', $? ($!)\n$output"
+                if $?;
+
+                print "Complete: '$path'\n"
+            }
+            or
+            warn;
+        }
+    }
+    else
+    {
+        die "No setup paths found: '$glob'";
+    }
+}
+
+my @found   = ();
+
+my $wanted
+= sub
+{
+    push @found, $File::Find::name
+};
+
+for my $path
+(
+    qw
+    (
+        t/version
+        t/dynamic
+        t/sandbox/.git
+    )
+)
+{
+    find $wanted, $path;
+}
+
+
+if( open my $fh, '>', 'MANIFEST' )
+{
+    print $fh <DATA>;
+    print $fh join "\n" => @found, '';
+
+    close $fh;
+}
+else
+{
+    die "Failed open: 'MANIFEST', $!";
+}
+
+# this is not a module
+$DB::single = 1;
+0
+__DATA__
+MANIFEST
+README
+CHANGES
+Makefile.PL
+lib/Module/FromPerlVer.pm
+lib/Module/FromPerlVer/Git.pm
+lib/Module/FromPerlVer/Dir.pm
+lib/Module/FromPerlVer/Extract.pm
+lib/Module/FromPerlVer/Util.pm
+
+# fixed tests
+
+t/00-usable.t
+t/01-default-args.t
+t/10-dir-defaults-no_copy.t
+t/11-use_dir.t
+t/12-dir-default-use.t
+t/13-reject-bogus-no-5.0.t
+
+# root of dynamic tests
+
+t/bin/20-file-defaults_t
+t/bin/21-git-local-defaults_t
+t/bin/30-file-version-from_t
+t/bin/31-git-local-version-from_t
+
+t/lib/Test/KwikHaks.pm
+
+# dynamic files

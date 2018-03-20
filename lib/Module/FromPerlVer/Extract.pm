@@ -4,6 +4,7 @@
 
 package Module::FromPerlVer::Extract;
 use 5.006;
+use version;
 
 use NEXT;
 
@@ -14,7 +15,7 @@ use Scalar::Util    qw( blessed );
 # package variables
 ########################################################################
 
-our $VERSION    = '0.1';
+our $VERSION    = version->parse( '0.1' )->numify;
 
 ########################################################################
 # methods

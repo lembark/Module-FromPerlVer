@@ -7,9 +7,12 @@ use v5.006;
 use strict;
 use version;
 
-use File::Basename  qw( basename    );
-use File::Temp      qw( tempfile    );
-use FindBin         qw( $Bin        );
+use File::Basename      qw( basename        );
+use File::Find          qw( finddepth       );
+use File::Temp          qw( tempfile        );
+use FindBin             qw( $Bin            );
+use List::Util          qw( pairmap uniq    );
+use List::MoreUtils     qw( zip             );
 
 use File::Spec::Functions
 qw
@@ -24,6 +27,24 @@ qw
 # package variables
 ########################################################################
 
+our $VERSION    = version->parse( '0.4.0' )->numify;
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
+
+my $wanted
+= sub
+{
+    '.' eq $_
+    or
+    -d
+    ? rmdir     || warn "Failed rmdir: '$_', $!"
+    : unlink    || warn "Failed unlink: '$_', $!"
+    ;
+};
+
+########################################################################
+# exported utilities
+########################################################################
+
 sub perl_v_from_basename
 {
     my $base    = basename $0, '.t';
@@ -35,7 +56,8 @@ sub perl_v_from_basename
     version->parse( $perl_v )
     or die "Botched test: invalid perl version '$perl_v' ($base).\n";
 
-    print "# Testing perl version: '$perl_v' ($base).\n";
+    print "# Testing perl version: '$perl_v' ($base)."
+    if $verbose;
 
     wantarray
     ? ( $base, $perl_v )
@@ -49,7 +71,8 @@ sub test_git_version
     die "Non-zero exit from git: '$?'.\n"
     if $?;
 
-    print "# git version: '$git'.\n";
+    print "# git version: '$git'."
+    if $verbose;
 
     $git
 }
@@ -71,7 +94,8 @@ sub search_bin
         -e $path
         or next;
 
-        print "# Test $base: '$path'.\n";
+        print "# Test $base: '$path'."
+        if $verbose;
 
         return $path
     }
@@ -130,20 +154,79 @@ sub mkdir_if
 {
     my $path = catdir @_;
 
-    print STDERR "mkdir_if: '$path'";
+    print "mkdir_if: '$path'"
+    if $verbose;
 
-    -d $path            ? print STDERR "Existing: '$path'."
-    : mkdir $path, 0777 ? print STDERR "Created: '$path'."
+    -d $path            ? print "Existing: '$path'."
+    : mkdir $path, 0777 ? print "Created: '$path'."
     : die "Failed mkdir: '$path', $!.\n"
     ;
 
     # no telling what umask or other things are doing to
     # the stats. just set it outright here.
 
-    chmod 0700, $path
+    chmod 0770, $path
     or die "Failed chmod: '$path', $!.\n";
 
     $path
+}
+
+sub rm_rf
+{
+    finddepth $wanted, $_
+    for @_;
+
+    -d && rmdir
+    for @_;
+}
+
+sub generate_versions
+{
+    my @versionz 
+    = qw
+    (
+        5.0.1
+        5.6.0
+        5.8.8
+        5.888.888
+        5.999.999
+    );
+
+    my @formatz
+    = qw
+    (
+        %d.%d.%d
+        %d.%03d%03d
+        %d.%03d.%03d
+        %d.%03d_%03d
+    );
+
+    # lexical sort works.
+
+    my @v_stringz
+    = uniq
+    sort
+    map
+    {
+        (
+            $_, "v$_"
+        )
+    }
+    pairmap
+    {
+        sprintf $a => @$b
+    }
+    map
+    {
+        my @v   = ( [ split /\W/ ] ) x @formatz;
+
+        zip @formatz, @v
+    }
+    @versionz;
+
+    wantarray
+    ?  @v_stringz
+    : \@v_stringz
 }
 
 1

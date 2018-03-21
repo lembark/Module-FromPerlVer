@@ -27,7 +27,7 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.3.0' )->numify;
+our $VERSION    = version->parse( 'v0.4.0' )->numify;
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my $nil         = sub{};
@@ -164,7 +164,11 @@ sub module_sources
 
     chomp
     (
-        my @tagz = qx{ git tag --list '$prefix*' }
+        # "git tag --list" fails on some systems, use the
+        # short version, see if that solves any of the
+        # problems.
+
+        my @tagz = qx{ git tag -l '$prefix*' }
     )
     or
     die "No tags like '$prefix*' found.\n";

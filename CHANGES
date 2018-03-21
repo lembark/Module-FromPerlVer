@@ -1,3 +1,8 @@
+-   v0.7.1 Tue Mar 20 21:46:05 CDT 2018
+
+    "git tag --list" fails on some systems.
+    Replace "--list" with "-l" and see if that helps.
+
 -   v0.7.0 Mon Mar 19 21:34:25 CDT 2018
     
     More test code pushed into KwikHaks.

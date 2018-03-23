@@ -35,7 +35,7 @@ my $wanted
 {
     '.' eq $_
     or
-    -d
+    -d $_
     ? rmdir     || warn "Failed rmdir: '$_', $!"
     : unlink    || warn "Failed unlink: '$_', $!"
     ;

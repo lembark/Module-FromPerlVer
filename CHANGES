@@ -1,4 +1,11 @@
--   v0.7.1 Tue Mar 20 21:46:05 CDT 2018
+-   v0.8.2 Fri Mar 23 10:55:36 CDT 2018
+
+    - explicit $_ in -d.
+    - Push most of the setup validation into 00-*.t in 
+      order to get output (Makefile.PL doesn't show up 
+      in testers' output).
+
+-   v0.8.1 Tue Mar 20 21:46:05 CDT 2018
 
     "git tag --list" fails on some systems.
     Replace "--list" with "-l" and see if that helps.

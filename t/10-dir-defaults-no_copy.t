@@ -8,32 +8,53 @@ my $madness = 'Module::FromPerlVer';
 use_ok $madness => qw( no_copy 1 )
 or BAIL_OUT "$madness is not usable.";
 
-my $filz    = $madness->source_files;
+my ( $filz, $dirz ) = $madness->source_files;
+
+my $exists
+= sub
+{
+    my $heading = shift || 'Existing';
+    my @resultz
+    = map
+    {
+        [ $_ => -e ]
+    }
+    (
+        @$dirz,
+        @$filz
+    );
+
+    diag "$heading:\n", explain \@resultz;
+
+    wantarray
+    ?  @resultz
+    : \@resultz
+};
 
 unlink @$filz;
+
+$exists->( 'Unlinked' );
 
 ok ! -e , "No pre-existing: '$_'"
 for @$filz;
 
 my $count   = $madness->get_files;
 
-diag "Processed: $count items";
-
 ok 10 == $count, "Get files returns $count (10)";
 
-my @found
-= map
-{
-    [ $_ => -e ]
-}
-@$filz;
+diag "Processed: $count items";
 
-diag "Found:\n",   explain \@found;
+my @pass1   = $exists->( 'Copied' );
 
-ok $_->[1] , "Installed: '$_'"
-for @found;
+ok $_->[1] , "Installed: '$_->[0]'"
+for @pass1;
 
 $madness->cleanup;
+
+$exists->( 'Cleanup' );
+
+# don't check $dirz on way out: there may be
+# items not in $filz that keep them alive.
 
 for( @$filz )
 {

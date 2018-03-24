@@ -19,7 +19,7 @@ my @methodz
 require_ok $madness
 or BAIL_OUT "$madness is not usable.";
 
-diag 'Require succeeds: VERSION = ' . $madness->VERSION;
+note 'Require $madness: VERSION = ' . $madness->VERSION;
 
 ok ! $madness->can( $_ ), "No pre-existing '$_'"
 for @methodz;

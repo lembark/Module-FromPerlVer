@@ -88,7 +88,6 @@ SKIP:
             fail "No version: '$v_rx'";
             diag "Git status: '$found'";
         }
-        
 
         1
     }

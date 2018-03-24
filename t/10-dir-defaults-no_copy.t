@@ -10,25 +10,43 @@ or BAIL_OUT "$madness is not usable.";
 
 my $filz    = $madness->source_files;
 
-note "Source files:\n", explain $filz;
+unlink @$filz;
 
 ok ! -e , "No pre-existing: '$_'"
 for @$filz;
 
 my $count   = $madness->get_files;
 
+diag "Processed: $count items";
+
 ok 10 == $count, "Get files returns $count (10)";
 
-ok -e , "Installed: '$_'"
-for @$filz;
+my @found
+= map
+{
+    [ $_ => -e ]
+}
+@$filz;
+
+diag "Found:\n",   explain \@found;
+
+ok $_->[1] , "Installed: '$_'"
+for @found;
 
 $madness->cleanup;
 
-ok ! -e , "Removed file: '$_'"
-for @$filz;
-
-ok ! -d , "Removed dir: '$_'"
-for qw( etc pod );
+for( @$filz )
+{
+    if( -e )
+    {
+        fail "Removed: '$_'";
+        diag "Failed cleanup: '$_'";
+    }
+    else
+    {
+        pass "Removed: '$_'";
+    }
+}
 
 done_testing;
 __END__

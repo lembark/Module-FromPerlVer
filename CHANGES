@@ -1,7 +1,7 @@
--   v0.8.3 
+-   v0.8.3 Sat Mar 24 10:54:36 CDT 2018
 
     Use short (single-char) args for git.
-    Modify verbosity of some tests.
+    Modify verbosity of some tests to see where they fail.
 
 -   v0.8.2 Fri Mar 23 10:55:36 CDT 2018
 

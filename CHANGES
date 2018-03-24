@@ -1,6 +1,6 @@
 -   v0.8.3 
 
-    Use short (sngle-char) args for git.
+    Use short (single-char) args for git.
     Modify verbosity of some tests.
 
 -   v0.8.2 Fri Mar 23 10:55:36 CDT 2018

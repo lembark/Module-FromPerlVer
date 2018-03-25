@@ -23,7 +23,7 @@ my $madness = 'Module::FromPerlVer';
 
 SKIP:
 {
-    my ( $base, $perl_v )  
+    my ( $base, $perl_v )
     = eval
     {
         Test::KwikHaks::perl_v_from_basename()

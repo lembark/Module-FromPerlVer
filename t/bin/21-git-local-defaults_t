@@ -42,6 +42,14 @@ SKIP:
     chdir $sandbox
     or BAIL_OUT "Failed chdir: '$sandbox', $!", 1;
 
+    my @found = qx{ git tag -l 'perl/*' 2>&1 };
+
+    $?
+    and BAIL_OUT "Failed git tag: non-zero exit $?";
+
+    @found
+    or BAIL_OUT "Failed git tag: no ouptut";
+
     local $ENV{ PERL_VERSION } = $perl_v;
 
     use_ok $madness => qw( use_git 1 git_tarball .git.tar )

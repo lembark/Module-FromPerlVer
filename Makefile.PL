@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.8.3'; 
+my $version = '0.8.4'; 
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.
@@ -98,10 +98,13 @@ WriteMakefile
         # note: Cwd has a fix that may avoid 
         # infinite looping in test for "abs_path '//'".
         # hopefully adding that here will fix the issue.
+        #
+        # L::U 1.44 has uniq
 
 		qw
         (
             Cwd                     3.073
+            List::Util              1.044
 
             Archive::Tar            0
             Carp                    0
@@ -111,7 +114,6 @@ WriteMakefile
             File::Spec::Functions   0
             FindBin                 0
             List::MoreUtils         0
-            List::Util              0
             NEXT                    0
             Scalar::Util            0
             Symbol                  0

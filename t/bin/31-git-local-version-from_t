@@ -43,6 +43,14 @@ SKIP:
     chdir $sandbox
     or skip "Failed chdir: '$sandbox', $!", 1;
 
+    my @found = qx{ git tag -l 'perl/*' 2>&1 };
+
+    $?
+    and BAIL_OUT "Failed git tag: non-zero exit $?";
+
+    @found
+    or BAIL_OUT "Failed git tag: no ouptut";
+ 
     my $v_file  = Test::KwikHaks::write_version_file( $perl_v )
     or skip "Failed writing version file.", 1;
 

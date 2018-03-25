@@ -1,12 +1,11 @@
 use 5.006;
+use lib qw( lib t/lib );
 
 use Test::More;
 use Archive::Tar;
 use File::Basename  qw( basename );
 
 use Cwd qw( getcwd );
-
-use lib qw( lib t/lib );
 
 for my $madness
 (
@@ -21,8 +20,6 @@ for my $madness
     )
 )
 {
-    diag "Require: $madness";
-
     require_ok $madness
     or BAIL_OUT "$madness is not usable.";
 

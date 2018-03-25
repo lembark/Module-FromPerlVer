@@ -9,6 +9,7 @@
 use 5.006;
 use strict;
 use version;
+use lib qw( lib t/lib );
 
 use Test::More;
 use Test::Deep;
@@ -16,7 +17,7 @@ use Test::Deep;
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
-use lib "$Bin/../lib";
+use lib( "$Bin/../../lib", "$Bin/../lib" );
 use Test::KwikHaks;
 
 my $madness = 'Module::FromPerlVer';

@@ -1,7 +1,6 @@
 ########################################################################
 # test using module with no args (all defaults) for perl version values.
 ########################################################################
-
 use 5.006;
 use strict;
 use version;
@@ -12,7 +11,7 @@ use Test::Deep;
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
-use lib "$Bin/../lib";
+use lib( "$Bin/../../lib", "$Bin/../lib" );
 use Test::KwikHaks;
 
 my $madness = 'Module::FromPerlVer';

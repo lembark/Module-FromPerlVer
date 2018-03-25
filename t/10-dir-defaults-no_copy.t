@@ -1,7 +1,9 @@
 use 5.006;
 use version;
+use lib qw( lib t/lib );
 
 use Test::More;
+
 
 my $madness = 'Module::FromPerlVer';
 

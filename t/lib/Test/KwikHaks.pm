@@ -71,6 +71,9 @@ sub test_git_version
     die "Non-zero exit from git: '$?'.\n"
     if $?;
 
+    die "Empty return from 'git --version'\n"
+    unless $git;
+
     print "# git version: '$git'."
     if $verbose;
 

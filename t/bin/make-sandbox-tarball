@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
 
+set -v;
+
 cd "$(dirname $0)/../..";
 
-rm -rf sandbox;
-mkdir  sandbox;
+init=(
+    'rm -rf'
+    'mkdir'
+    'git init'
+    'cd'
+);
 
-cd ./sandbox;
+for i in "${init[@]}"
+do
+    $i ./sandbox;
+done
 
-git init .;
-
-echo '.git' > .gitignore;
-git add .;
+echo -e ".git.tar\n?[^.]" > .gitignore;
+git add .gitignore;
 git commit -m'.gitignore';
 
 for i in ../version/*; 
@@ -29,6 +36,11 @@ do
 
     rm -rf *;
 done
+
+# remove any cruft, push the empty head.
+rm -rf *;
+git add .;
+git commit -m'empty directory';
 
 tar cf .git.tar .git;
 

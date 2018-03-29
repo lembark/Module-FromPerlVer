@@ -34,6 +34,8 @@ my $glob    = '../bin/*_t';
 my $work_d  = "$Bin/..";
 my $d_base  = 'dynamic';
 
+*output     = Test::KwikHaks->can( 'output' );
+
 ########################################################################
 # symlink all of the test templates to version-specific paths.
 ########################################################################
@@ -53,11 +55,11 @@ or die "Failed chdir: '$d_base', $!";
 my @testz   = glob $glob
 or die "Botched $0: no files like '$glob'.\n";
 
-print join "\n#\t" => '# Tests:', @testz;
+output( Tests => @testz );
 
 for my $path ( @testz )
 {
-    print "Link: '$path'.";
+    output( "Link: '$path'." );
     
     my $base    = basename $path => '_t';
     my $pref    
@@ -72,7 +74,7 @@ for my $path ( @testz )
     # that or a glob-and-loop checking each one which seems
     # like overkill...
 
-    print "Cleanup: '$pref-*'.";
+    output( "Cleanup: '$pref-*'." );
 
     unlink "$pref-*.t";
 
@@ -80,7 +82,7 @@ for my $path ( @testz )
     {
         my $link    = "$base-$perl_v.t";
 
-        print "Symlink: $link";
+        output( "Symlink: $link" );
 
         # no telling if the previous unlink might have
         # failed for some offball reason...

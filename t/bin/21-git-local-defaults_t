@@ -13,6 +13,7 @@ use version;
 use Test::More;
 use Test::Deep;
 
+use Cwd             qw( getcwd      );
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
@@ -20,6 +21,11 @@ use lib( "$Bin/../../lib", "$Bin/../lib" );
 use Test::KwikHaks;
 
 my $madness = 'Module::FromPerlVer';
+
+*output     = Test::KwikHaks->can( 'output' );
+*rm_rf      = Test::KwikHaks->can( 'rm_rf' );
+
+output();
 
 SKIP:
 {
@@ -42,7 +48,19 @@ SKIP:
     chdir $sandbox
     or BAIL_OUT "Failed chdir: '$sandbox', $!", 1;
 
-    my @found = qx{ git tag -l 'perl/*' 2>&1 };
+    output( 'Working directory: ' . getcwd );
+
+    # anything other than .git and .git.tar can be 
+    # cleaned up prior to execution to give a reasonable
+    # result for status.
+
+    qx{ git checkout HEAD 2>&1 };
+
+    chomp( my @status  = qx{ git status . } );
+
+    output( "Sandox status", @status );
+
+    chomp( my @found = qx{ git tag -l 'perl/*' 2>&1 } );
 
     $?
     and BAIL_OUT "Failed git tag: non-zero exit $?";
@@ -61,7 +79,9 @@ SKIP:
 
     for my $found ( $madness->source_files )
     {
-        note "Source files:\n", explain $found;
+        output( "Source files", explain $found );
+
+        # git objects don't return source files 
 
         fail "Extraneous souce files: $found";
     }
@@ -100,6 +120,11 @@ SKIP:
         1
     }
     or fail "Unable to determine branch: $@";
+
+    # reset the directory to avoid cruft messages from 
+    # git status in initial checks.
+  
+    qx{ 'git checkout HEAD' 2>&1 };
 }
 
 done_testing;

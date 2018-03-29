@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.8.4'; 
+my $version = '0.8.5'; 
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.
@@ -104,7 +104,7 @@ WriteMakefile
 		qw
         (
             Cwd                     3.073
-            List::Util              1.044
+            List::Util              1.050
 
             Archive::Tar            0
             Carp                    0

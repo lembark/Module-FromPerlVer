@@ -39,8 +39,10 @@ or die "Botched Test::KwikHaks: cannot 'generate_versions'.\n";
 my $rm  = Test::KwikHaks->can( 'rm_rf' )
 or die "Botched Test::KwikHaks: cannot 'rm_rf'.\n";
 
-my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
+*output = Test::KwikHaks->can( 'output' );
+
 my $v_base      = 'version';
+
 
 my @mod_specz = 
 (
@@ -127,7 +129,7 @@ my $work_d  = "$Bin/../..";
 chdir $work_d
 or die "Failed chdir: $!.\n";
 
-print STDERR 'Working directory: ' . getcwd;
+output( 'Working directory: ' . getcwd );
 
 $rm->( $v_base );
 
@@ -143,8 +145,7 @@ for my $v_string ( $gv->() )
     {
         my $vers_d  = $md->( "./$v_string" );
 
-        print "Version dir: '$vers_d'"
-        if $verbose;
+        output( "Version dir: '$vers_d'" );
 
         for( @file_specz )
         {
@@ -152,8 +153,7 @@ for my $v_string ( $gv->() )
 
             my $v_sub   = $md->( $vers_d, $sub );
 
-            print "Subdir: '$v_sub'"
-            if $verbose;
+            output( "Subdir: '$v_sub'" );
 
             for( @mod_specz )
             {
@@ -161,8 +161,7 @@ for my $v_string ( $gv->() )
 
                 my $base    = "$name.$ext";
 
-                print "Generate: '$base'"
-                if $verbose;
+                output( "Generate: '$base'" );
 
                 make_v_file $v_string, $v_sub, $base, $name, $use, $format;
             }

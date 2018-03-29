@@ -4,6 +4,7 @@ use lib qw( lib t/lib );
 
 use Test::More;
 
+my $verbose     = #$ENV{ VERBOSE_FROMPERLVER };
 
 my $madness = 'Module::FromPerlVer';
 
@@ -26,7 +27,8 @@ my $exists
         @$filz
     );
 
-    diag "$heading:\n", explain \@resultz;
+    diag "$heading:\n", explain \@resultz
+    if $verbose;
 
     wantarray
     ?  @resultz
@@ -44,7 +46,8 @@ my $count   = $madness->get_files;
 
 ok 10 == $count, "Get files returns $count (10)";
 
-diag "Processed: $count items";
+diag "Processed: $count items"
+if $verbose;
 
 my @pass1   = $exists->( 'Copied' );
 

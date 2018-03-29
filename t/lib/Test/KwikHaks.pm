@@ -7,12 +7,12 @@ use v5.006;
 use strict;
 use version;
 
-use File::Basename      qw( basename        );
-use File::Find          qw( finddepth       );
-use File::Temp          qw( tempfile        );
-use FindBin             qw( $Bin            );
-use List::Util          qw( pairmap uniq    );
-use List::MoreUtils     qw( zip             );
+use File::Basename      qw( basename    );
+use File::Find          qw( finddepth   );
+use File::Temp          qw( tempfile    );
+use FindBin             qw( $Bin        );
+use List::Util          qw( pairmap     );
+use List::MoreUtils     qw( zip uniq    );
 
 use File::Spec::Functions
 qw
@@ -28,7 +28,7 @@ qw
 ########################################################################
 
 our $VERSION    = version->parse( '0.4.0' )->numify;
-my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
+my $verbose     = 1; #$ENV{ VERBOSE_FROMPERLVER };
 
 my $wanted
 = sub
@@ -41,12 +41,41 @@ my $wanted
     ;
 };
 
+my $output_fh
+= $verbose
+? *STDERR{ IO }
+: *STDOUT{ IO }
+;
+
 ########################################################################
 # exported utilities
 ########################################################################
 
+sub output
+{
+    local $\    = "\n";
+
+    if( @_ > 1 )
+    {
+        my $head    = shift;
+
+        print $output_fh join "\n#  " => "# $head:", @_
+    }
+    elsif( @_ )
+    {
+        print $output_fh "# $_[0]";
+    }
+    else
+    {
+        print $output_fh '';
+    }
+
+    return
+}
+
 sub perl_v_from_basename
 {
+    local $\    = "\n";
     my $base    = basename $0, '.t';
     my $i       = rindex $base, '-';
 
@@ -56,8 +85,7 @@ sub perl_v_from_basename
     version->parse( $perl_v )
     or die "Botched test: invalid perl version '$perl_v' ($base).\n";
 
-    print "# Testing perl version: '$perl_v' ($base)."
-    if $verbose;
+    output( "Testing perl version: '$perl_v' ($base)." );
 
     wantarray
     ? ( $base, $perl_v )
@@ -66,6 +94,7 @@ sub perl_v_from_basename
 
 sub test_git_version
 {
+    local $\    = "\n";
     chomp( my $git = qx( git --version ) );
 
     die "Non-zero exit from git: '$?'.\n"
@@ -74,8 +103,7 @@ sub test_git_version
     die "Empty return from 'git --version'\n"
     unless $git;
 
-    print "# git version: '$git'."
-    if $verbose;
+    output( "git version: '$git'." );
 
     $git
 }
@@ -97,8 +125,7 @@ sub search_bin
         -e $path
         or next;
 
-        print "# Test $base: '$path'."
-        if $verbose;
+        output( "Test $base: '$path'." );
 
         return $path
     }
@@ -157,11 +184,10 @@ sub mkdir_if
 {
     my $path = catdir @_;
 
-    print "mkdir_if: '$path'"
-    if $verbose;
+    output( "mkdir_if: '$path'" );
 
-    -d $path            ? print "Existing: '$path'."
-    : mkdir $path, 0777 ? print "Created: '$path'."
+    -d $path            ? output( "Existing: '$path'." )
+    : mkdir $path, 0777 ? output( "Created:  '$path'." )
     : die "Failed mkdir: '$path', $!.\n"
     ;
 

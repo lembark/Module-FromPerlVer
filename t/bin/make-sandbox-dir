@@ -6,6 +6,10 @@
 use File::Basename;
 use Archive::Tar;
 
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
+use Test::KwikHaks;
+
 ########################################################################
 # package variables 
 ########################################################################
@@ -15,6 +19,8 @@ my $git_d   = "$sand_d/.git";
 my $tball   = "$git_d.tar";
 
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
+
+*output = Test::KwikHaks->can( 'output' );
 
 ########################################################################
 # generate the ./git directory with version tags.

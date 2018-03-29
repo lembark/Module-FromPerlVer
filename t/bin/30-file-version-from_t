@@ -29,9 +29,13 @@ my $madness = 'Module::FromPerlVer';
 
 my $wv      = Test::KwikHaks->can( 'write_version_file' );
 
+*output     = Test::KwikHaks->can( 'output' );
+
 ########################################################################
 # test reading version from "use" or "no".
 ########################################################################
+
+output();
 
 delete $ENV{ PERL_VERSION };
 

@@ -17,7 +17,10 @@ use Test::KwikHaks;
 my $madness = 'Module::FromPerlVer';
 my $v_dir   = 'version';
 
-note "Test sandbox: '$v_dir'";
+*output     = Test::KwikHaks->can( 'output' );
+
+output();
+output( "Test sandbox: '$v_dir'" );
 
 my ( $base, $perl_v )  
 = eval

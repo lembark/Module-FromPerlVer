@@ -27,7 +27,7 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.4.0' )->numify;
+our $VERSION    = version->parse( 'v0.4.1' )->numify;
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my $nil         = sub{};
@@ -212,7 +212,7 @@ sub get_files
         "@checkout '$tag'"
     };
 
-    my @output = qx{ $cmd };
+    my @output = qx{ $cmd 2>&1 };
     if( my $err = $? )
     {
         local $, = "\n#\t";

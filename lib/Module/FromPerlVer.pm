@@ -26,7 +26,7 @@ use Module::FromPerlVer::Git;
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( '0.3.1' )->numify;
+our $VERSION    = version->parse( '0.3.2' )->numify;
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my %defaultz = 
@@ -465,7 +465,7 @@ local $| = 1;
 
     # get first line of output after test header.
 
-    print '';
+    print '#';
 
     my $argz    = &$extract_args;
     my $extract = $make_extract->( $argz );

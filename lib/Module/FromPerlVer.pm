@@ -6,7 +6,7 @@
 # File::Copy::Recursive & friends -- yeah, ancient.
 
 package Module::FromPerlVer;
-use 5.006;
+use 5.008;
 use strict;
 use version;
 
@@ -26,7 +26,7 @@ use Module::FromPerlVer::Git;
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( '0.3.2' )->numify;
+our $VERSION    = version->parse( '0.4.0' )->numify;
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
 
 my %defaultz = 
@@ -46,6 +46,7 @@ my %defaultz =
     # directory
 
     version_dir     => 'version',
+    work_dir        => '.',
 
     # git
 
@@ -834,10 +835,17 @@ specific version of perl:
 
 =item use Module::FromPerlVer ( version_from => $path );
 
-The path will be scanned for "use <version string>" and the first
-one located will be processed. The file can be a module, executable,
-or flat file with one line in it, so long as "use" followed by a
-parsable version string is found Life is Good.
+The path will be scanned for the first instance of:
+
+    use <version string>;
+
+    no  <version string>;
+
+and the first one located will be processed. The file can be a module, 
+executable, or flat file with one line in it. 
+
+The difference is that the "no version" will subtract 0.000001 from
+the numified version string before comparing for the maximum perl
 
 The main use of this is validating multiple versions of perl 
 with a specific release of the module.
@@ -847,6 +855,20 @@ with a specific release of the module.
 If you hate the name "version", use "version_dir" to set it:
 
     use Module::FromPerlVer qw( version_dir history );
+
+=item Choosing the destination for Dir copy.
+
+The default destination for copies using Dir is '.', which makes
+sense most of the time. Parallel testing breaks this approach. In
+that case use "work_dir" to put the copies into a seprate location,
+for example:
+
+    my $work_tmp    
+    = tempdir XXXX => qw( DIR sandbox CLEANP 1 );
+
+    use Module::FromPerlVer ( work_dir => $work_tmp );
+
+will make all of the copies from version into the temporary directory.
 
 =item Skipping the Copy
 
@@ -911,9 +933,10 @@ Another example with a file_from input (t/bin/30*_t):
     # Get files with: 'Dir'
     # Processed: 10 files/dirs from './t/version/v5.000001'
 
-The arguments parsed were "use_dir" and "version-from" using
+The arguments parsed were "use_dir" and "version_from" using
 1 and a tempfile. Notice it found the "verison" directory
-in "./t/version".
+in "./t/version" since the tests run from ./t and $Bin is 
+searched up the path.
 
 =over 4
 

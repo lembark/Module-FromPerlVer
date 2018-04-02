@@ -1,4 +1,24 @@
--   v0.8.5 
+-   v0.9.0
+
+    Deal with multi-threaded tests by extracting a new sandbox
+    for each Git test. This avoids failures due to mutiple 
+    git calls colliding in the sandbox. Avoid shipping the 
+    .git directory in favor of the tarball.
+
+    Add sub to kwikhaks for generating tempdir w/ CLEANUP 
+    in sandbox for each test.
+
+    Add "work_dir" dir parameter for destination of copy. This
+    is mosty for testing in multi-threaded environments.
+
+-   v0.8.6 
+
+    Reduce test output.
+    Add sort to keep test stable.
+
+    Require v5.8
+
+-   v0.8.5 Thu Mar 29 15:34:58 CDT 2018
 
     Require List::Util v1.50 to ensure working pair functions.
 

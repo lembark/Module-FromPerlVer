@@ -1,10 +1,10 @@
-use 5.006;
-use version;
+use 5.008;
 use lib qw( lib t/lib );
 
 use Test::More;
+use Test::Deep;
 
-my $verbose     = #$ENV{ VERBOSE_FROMPERLVER };
+my $verbose     = $ENV{ VERBOSE_FROMPERLVER } || '';
 
 my $madness = 'Module::FromPerlVer';
 
@@ -22,12 +22,16 @@ my $exists
     {
         [ $_ => -e ]
     }
+    sort
+    {
+        $a cmp $b
+    }
     (
         @$dirz,
         @$filz
     );
 
-    diag "$heading:\n", explain \@resultz
+    note "$heading:\n", explain \@resultz
     if $verbose;
 
     wantarray
@@ -37,42 +41,28 @@ my $exists
 
 unlink @$filz;
 
-$exists->( 'Unlinked' );
+my $prior   = $exists->( 'Prior' );
 
 ok ! -e , "No pre-existing: '$_'"
 for @$filz;
 
-my $count   = $madness->get_files;
+for my $found ( $madness->get_files )
+{
+    my $expect  = 1 + @$filz + @$dirz;
 
-ok 10 == $count, "Get files returns $count (10)";
+    ok $found == $expect, "Get files returns $found ($expect)";
+}
 
-diag "Processed: $count items"
-if $verbose;
-
-my @pass1   = $exists->( 'Copied' );
+my @copy    = $exists->( 'Copied' );
 
 ok $_->[1] , "Installed: '$_->[0]'"
-for @pass1;
+for @copy;
 
 $madness->cleanup;
 
-$exists->( 'Cleanup' );
+my $after   = $exists->( 'After' );
 
-# don't check $dirz on way out: there may be
-# items not in $filz that keep them alive.
-
-for( @$filz )
-{
-    if( -e )
-    {
-        fail "Removed: '$_'";
-        diag "Failed cleanup: '$_'";
-    }
-    else
-    {
-        pass "Removed: '$_'";
-    }
-}
+cmp_deeply $after, $prior, 'Cleanup';
 
 done_testing;
 __END__

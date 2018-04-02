@@ -3,7 +3,7 @@
 ########################################################################
 
 package Module::FromPerlVer::Extract;
-use 5.006;
+use 5.008;
 use version;
 
 use NEXT;

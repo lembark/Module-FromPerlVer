@@ -1,4 +1,4 @@
-use 5.006;
+use 5.008;
 use lib qw( lib t/lib );
 
 use Test::More;
@@ -6,6 +6,11 @@ use Archive::Tar;
 use File::Basename  qw( basename );
 
 use Cwd qw( getcwd );
+
+use lib( "$Bin/../../lib", "$Bin/../lib" );
+use Test::KwikHaks;
+
+*output     = Test::KwikHaks->can( 'output' );
 
 for my $madness
 (
@@ -45,8 +50,8 @@ or do
     diag "No git version: $@";
 };
 
--d $_ or BAIL_OUT "Botched distro: missing '$_'."
-for qw( version sandbox sandbox/.git );
+-e $_ or BAIL_OUT "Botched distro: missing '$_'."
+for qw( version sandbox sandbox/git.tar );
 
 done_testing;
 __END__

@@ -3,7 +3,7 @@
 ########################################################################
 
 package Module::FromPerlVer::Util;
-use 5.006;
+use 5.008;
 use strict;
 use version;
 

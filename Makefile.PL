@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-use 5.006;
+use 5.008;
 use strict;
 use version;
 
@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.8.5'; 
+my $version = '0.8.7'; 
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.
@@ -33,8 +33,8 @@ my @test_spec =
     }
 );
 
-my @dist_spec = ();
-#(
+my @dist_spec =
+(
 #    dist =>
 #    {
 #        # the local_repo.tar is *not* in the MANIFEST.
@@ -44,7 +44,7 @@ my @dist_spec = ();
 #        PREOP =>
 #        q{ cd sandbox/ && /bin/tar cvf .git.tar .git },
 #    }
-#);
+);
 
 my @merge_spec
 = do

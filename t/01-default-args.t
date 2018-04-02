@@ -1,5 +1,4 @@
-use 5.006;
-use version;
+use 5.008;
 use lib qw( lib t/lib );
 
 use Test::More;
@@ -20,7 +19,7 @@ my @methodz
 require_ok $madness
 or BAIL_OUT "$madness is not usable.";
 
-note 'Require $madness: VERSION = ' . $madness->VERSION;
+note "Require $madness: VERSION = " . $madness->VERSION;
 
 ok ! $madness->can( $_ ), "No pre-existing '$_'"
 for @methodz;

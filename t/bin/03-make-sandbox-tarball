@@ -2,7 +2,7 @@
 
 set -v;
 
-cd "$(dirname $0)/../..";
+pushd "$(dirname $0)/../..";
 
 init=(
     'rm -rf'
@@ -15,10 +15,6 @@ for i in "${init[@]}"
 do
     $i ./sandbox;
 done
-
-echo -e ".git.tar\n?[^.]" > .gitignore;
-git add .gitignore;
-git commit -m'.gitignore';
 
 for i in ../version/*; 
 do
@@ -42,15 +38,17 @@ rm -rf *;
 git add .;
 git commit -m'empty directory';
 
-tar cf .git.tar .git;
+tar cf git.tar .git;
 
 # push fake sandbox into module's git.
 # .gitignore avoids issues with
 # submodule.
 
-cd ..;
+rm -rf .git;
+
+cd 
 git add sandbox;
-git commit -m'minimal sandbox for t/2*';
+git commit -m'minimal sandbox for t/?1-*';
 
 exit 0;
 

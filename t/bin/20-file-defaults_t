@@ -1,7 +1,7 @@
 ########################################################################
 # test using module with no args (all defaults) for perl version values.
 ########################################################################
-use 5.006;
+use 5.008;
 use strict;
 use version;
 
@@ -11,17 +11,24 @@ use Test::Deep;
 use File::Basename  qw( basename    );
 use FindBin         qw( $Bin        );
 
+use File::Spec::Functions
+qw
+(
+    &catpath
+);
+
 use lib( "$Bin/../../lib", "$Bin/../lib" );
 use Test::KwikHaks;
 
 my $madness = 'Module::FromPerlVer';
-my $v_dir   = 'version';
+my $vers_d  = 'version';
+my $work_d  = eval { Test::KwikHaks::lib_tmpdir }
+or BAIL_OUT "Failed create tmpdir: $@";
 
 *output     = Test::KwikHaks->can( 'output' );
 
 output();
-output( "Test sandbox: '$v_dir'" );
-
+output( "Test sandbox: '$vers_d'" );
 my ( $base, $perl_v )  
 = eval
 {
@@ -33,7 +40,7 @@ local $ENV{ PERL_VERSION } = $perl_v;
 
 eval
 {
-    use_ok $madness;
+    use_ok $madness, work_dir => $work_d;
 
     1
 }
@@ -41,7 +48,7 @@ or BAIL_OUT "Use failed: $@";
 
 for my $prefix ( $madness->source_prefix )
 {
-    is $prefix, $v_dir, "Source prefix: '$prefix' ($v_dir)";
+    is $prefix, $vers_d, "Source prefix: '$prefix' ($vers_d)";
 }
 
 for my $found ( scalar $madness->source_files )
@@ -53,8 +60,12 @@ for my $found ( scalar $madness->source_files )
 
     note "Source files:\n", explain $found;
 
-    ok -e , "Found: '$_'"
-    for @$found;
+    for my $item ( @$found )
+    {
+        my $path    = catpath '', $work_d, $item;
+
+        ok -e $path , "Found: '$item' ($work_d)";
+    }
 }
 
 eval

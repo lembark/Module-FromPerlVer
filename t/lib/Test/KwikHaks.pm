@@ -7,12 +7,16 @@ use v5.006;
 use strict;
 use version;
 
-use File::Basename      qw( basename    );
-use File::Find          qw( finddepth   );
-use File::Temp          qw( tempfile    );
-use FindBin             qw( $Bin        );
-use List::Util          qw( pairmap     );
-use List::MoreUtils     qw( zip uniq    );
+use Archive::Tar;
+
+use Cwd                 qw( getcwd              );
+use File::Basename      qw( basename            );
+use File::Find          qw( finddepth           );
+use File::Temp          qw( tempfile tempdir    );
+use FindBin             qw( $Bin                );
+use List::Util          qw( pairmap             );
+use List::MoreUtils     qw( zip uniq            );
+use Symbol              qw( qualify_to_ref      );
 
 use File::Spec::Functions
 qw
@@ -131,16 +135,28 @@ sub search_bin
     }
     continue
     {
-        pop @dirz
+        pop @dirz;
     }
 
     return
 }
 
-sub sandbox_path    { search_bin 'sandbox'          }
-sub version_path    { search_bin 'version'          }
-sub git_path        { search_bin 'sandbox/.git'     }
-sub tball_path      { search_bin 'sandbox/.git.tar' }
+for
+(
+    [ sandbox_path  => 'sandbox'            ],
+    [ version_path  => 'version'            ],
+    [ tball_path    => 'sandbox/git.tar'    ],
+)
+{
+    my ( $name, $rel_path ) = @$_;
+
+    *{ qualify_to_ref $name }
+    = sub
+    {
+        search_bin  $rel_path
+        or die "Failed search_bin: '$rel_path' ($Bin)"
+    };
+}
 
 sub write_version_file
 {
@@ -256,6 +272,55 @@ sub generate_versions
     wantarray
     ?  @v_stringz
     : \@v_stringz
+}
+
+sub sandbox_tmpdir
+{
+    my $tball   = tball_path();
+    my $sand_d  = sandbox_path();
+    my $tmpl    = basename $0 . '-XXXX';
+
+    # alive at this point => paths are usable.
+
+    my $sand_tmp
+    = tempdir
+    (
+        $tmpl =>
+        DIR     => $sand_d,
+        CLEANUP => 1,
+    )
+    or die "Failed create tmpdir: $!.\n";
+
+    output "Sandbox: '$sand_tmp'";
+    output "Extract: '$tball'";
+
+    chdir $sand_tmp
+    or die "Failed chdir: '$sand_tmp', $!";
+
+    Archive::Tar->extract_archive( $tball );
+
+    $sand_tmp
+}
+
+sub lib_tmpdir
+{
+    my $sand_d  = sandbox_path();
+    my $tmpl    = basename $0 . '-XXXX';
+
+    # alive at this point => paths are usable.
+
+    my $work_tmp
+    = tempdir
+    (
+        $tmpl =>
+        DIR     => $sand_d,
+        CLEANUP => 1,
+    )
+    or die "Failed create tmpdir: $!.\n";
+
+    output "Work dir: '$work_tmp'";
+
+    $work_tmp
 }
 
 1

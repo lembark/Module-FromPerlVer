@@ -2,7 +2,7 @@
 # test using module with no args (all defaults) for perl version values.
 ########################################################################
 
-use 5.006;
+use 5.008;
 use strict;
 use version;
 use lib qw( lib t/lib );

@@ -1,5 +1,4 @@
-use 5.006;
-use version;
+use 5.008;
 use lib qw( lib t/lib );
 
 use Test::More;

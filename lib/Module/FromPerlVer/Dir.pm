@@ -3,7 +3,7 @@
 ########################################################################
 
 package Module::FromPerlVer::Dir;
-use 5.006;
+use 5.008;
 use strict;
 use version;
 use parent  qw( Module::FromPerlVer::Extract );
@@ -35,7 +35,7 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.3.0' )->numify;
+our $VERSION    = version->parse( 'v0.4.0' )->numify;
 our @CARP_NOT   = ( __PACKAGE__ );
 
 my $verbose     = $ENV{ VERBOSE_FROMPERLVER };
@@ -149,10 +149,11 @@ sub get_files
     my $extract = shift;
 
     my ( $filz, $dirz ) = @{ $extract->value( 'source_files' ) };
-    my $path            = $extract->value( 'module_source' ); 
-    my $found           = dircopy $path, '.';
+    my $src             = $extract->value( 'module_source'  ); 
+    my $dst             = $extract->value( 'work_dir'       );
+    my $found           = dircopy $src, $dst;
     
-    print "# Processed: $found files/dirs from '$path'";
+    print "# Processed: $found files/dirs from '$src'";
 
     my $expect          = @$filz + @$dirz + 1;
 

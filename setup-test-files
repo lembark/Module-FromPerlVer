@@ -5,10 +5,10 @@ use lib 't/lib';
 
 use File::Find  qw( find    );
 
-for my $glob ( "t/bin/make-*-dir" )
+for my $glob ( "t/bin/??-make-*" )
 {
-    local $ENV{ VERBOSE_FROMPERLVER } = 1;
-    local *STDOUT   = *STDERR;
+    local $ENV{ VERBOSE_FROMPERLVER } = '';
+#    local *STDOUT   = *STDERR;
     local $,        = "\n";
 
     print "Searching for setup: '$glob'\n";
@@ -48,6 +48,8 @@ my @found   = ();
 my $wanted
 = sub
 {
+    -f 
+    and
     push @found, $File::Find::name
 };
 
@@ -90,6 +92,10 @@ lib/Module/FromPerlVer/Git.pm
 lib/Module/FromPerlVer/Dir.pm
 lib/Module/FromPerlVer/Extract.pm
 lib/Module/FromPerlVer/Util.pm
+
+# tarball to generate the test sandbox.
+
+sandbox/git.tar
 
 # fixed tests
 

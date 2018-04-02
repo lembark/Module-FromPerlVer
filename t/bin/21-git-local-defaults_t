@@ -6,7 +6,7 @@
 #   "20-bar-v5.005003"
 # will test varieties of the same perl version string.
 ########################################################################
-use 5.006;
+use 5.008;
 use strict;
 use version;
 
@@ -42,13 +42,14 @@ SKIP:
     }
     or skip "Git not available ($@)", 1;
 
-    my $sandbox = Test::KwikHaks::sandbox_path()
-    or BAIL_OUT "Non-existant: 'sandbox'", 1;
+    my $sandbox 
+    = eval
+    {
+        Test::KwikHaks::sandbox_tmpdir()
+    }
+    or skip "No tempdir: $@";
 
-    chdir $sandbox
-    or BAIL_OUT "Failed chdir: '$sandbox', $!", 1;
-
-    output( 'Working directory: ' . getcwd );
+    output( 'Working directory: ' . basename $sandbox );
 
     # anything other than .git and .git.tar can be 
     # cleaned up prior to execution to give a reasonable

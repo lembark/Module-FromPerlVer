@@ -30,7 +30,7 @@ test_git_version;
 
 if( -d $git_d )
 {
-    print "Existing: '$git_d'\n";
+    output( "Existing: '$git_d'\n" );
 }
 elsif( -e $tball )
 {
@@ -39,7 +39,7 @@ elsif( -e $tball )
     select *STDERR
     if $verbose;
 
-    print "Recover $git_d using '$tball'.\n";
+    output( "Recover $git_d using '$tball'.\n" );
 
     my $tar = Archive::Tar->new;
 
@@ -51,11 +51,11 @@ elsif( -e $tball )
         $tar->extract_archive( basename $tball )
         or die 'Failed extract: ' . $tar->error;
 
-        print "Extracted $tball -> $git_d\n";
+        output( "Extracted $tball -> $git_d\n" );
         
         1
     }
-    ? print "Prepared sandbox: '$git_d'\n"
+    ? output( "Prepared sandbox: '$git_d'\n" )
     : warn "Failed extract: Git.pm tests will be skipped\n$@\n"
     ;
 }

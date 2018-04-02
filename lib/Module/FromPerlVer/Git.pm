@@ -3,7 +3,7 @@
 ########################################################################
 
 package Module::FromPerlVer::Git;
-use 5.006;
+use 5.008;
 use strict;
 use version;
 use parent  qw( Module::FromPerlVer::Extract );

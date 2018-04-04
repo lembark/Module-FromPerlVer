@@ -1,4 +1,4 @@
--   v0.9.0
+-   v0.9.0  Tue Apr  3 19:01:18 CDT 2018
 
     Deal with multi-threaded tests by extracting a new sandbox
     for each Git test. This avoids failures due to mutiple 
@@ -11,7 +11,7 @@
     Add "work_dir" dir parameter for destination of copy. This
     is mosty for testing in multi-threaded environments.
 
--   v0.8.6 
+-   v0.8.6  whenever...
 
     Reduce test output.
     Add sort to keep test stable.

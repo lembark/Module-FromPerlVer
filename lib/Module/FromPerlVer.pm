@@ -238,13 +238,21 @@ DIE
     else
     {
         # this *should* always be parseable.
+        # but is isn't! 5.8 has problems with
+        # version dealing with $^V. Hopefully
+        # the eval will give a better idea of
+        # what is going on.
 
-        print "#  Running Perl: '$^V'"
+        print STDERR "#  Running Perl: '$^V'"
         if $verbose;
 
-        $perl_v = version->parse( $^V )->numify
+        $perl_v 
+        = eval
+        {
+            version->parse( $^V )->numify
+        }
         or
-        die "Severe weirdness: unparsable \$^V ($^V).\n";
+        die "Unparsable \$^V: '$^V', $@.\n";
     }
 
     # at this point the version has been parsed and numified.
@@ -335,7 +343,7 @@ my @handlerz =
 
         my ( $mod_v, $path ) = @$found;
 
-        print "# Module version: $mod_v <= $perl_v";
+        print "# Module selects: '$mod_v' from $perl_v";
 
         $extract->value( module_source => $path );
 

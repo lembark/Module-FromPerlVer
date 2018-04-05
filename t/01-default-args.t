@@ -38,11 +38,18 @@ eval
 or
 fail "Failed import: $@";
 
+$perl_v
+= eval
+{
+    version->parse( $^V )->numify
+}
+or BAIL_OUT "Failed parse: \$^V: '$^V', $@";
+
 for
 (
-    [ perl_version  => version->parse( $^V )->numify    ],
-    [ source_prefix => 't/version'                      ],
-    [ module_source => 't/version/5.005003'             ],
+    [ perl_version  => $perl_v              ],
+    [ source_prefix => 't/version'          ],
+    [ module_source => 't/version/5.005003' ],
 )
 {
     my ( $method, $expect ) = @$_;

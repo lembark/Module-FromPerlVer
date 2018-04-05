@@ -3,7 +3,7 @@
 ########################################################################
 
 package Test::KwikHaks;
-use v5.006;
+use v5.008;
 use strict;
 use version;
 

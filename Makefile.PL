@@ -95,14 +95,11 @@ WriteMakefile
         # standard distro, particular versions 
         # are unlikely to cause pain.
         #
-        # note: Cwd has a fix that may avoid 
-        # infinite looping in test for "abs_path '//'".
-        # hopefully adding that here will fix the issue.
-        #
         # L::U 1.44 has uniq
 
 		qw
         (
+            version                 0.9918
             Cwd                     3.073
             List::Util              1.050
 

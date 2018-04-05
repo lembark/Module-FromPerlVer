@@ -35,6 +35,8 @@ my @test_spec =
 
 my @dist_spec =
 (
+# steps to execute prior to testing.
+#
 #    dist =>
 #    {
 #        # the local_repo.tar is *not* in the MANIFEST.

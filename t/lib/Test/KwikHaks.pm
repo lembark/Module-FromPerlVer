@@ -45,34 +45,60 @@ my $wanted
     ;
 };
 
+my $err_fh  = *STDERR{ IO };
+my $out_fh  = *STDOUT{ IO };
+
 my $output_fh
 = $verbose
-? *STDERR{ IO }
-: *STDOUT{ IO }
+? $err_fh
+: $out_fh
 ;
 
 ########################################################################
 # exported utilities
 ########################################################################
 
-sub output
+sub format
 {
-    local $\    = "\n";
-
     if( @_ > 1 )
     {
         my $head    = shift;
 
-        print $output_fh join "\n#  " => "# $head:", @_
+        join "\n#  " => "# $head:", @_
     }
     elsif( @_ )
     {
-        print $output_fh "# $_[0]";
+        "# $_[0]";
     }
     else
     {
-        print $output_fh '';
+        '';
     }
+}
+
+sub output
+{
+    local $\    = "\n";
+
+    my $output  = &format;
+
+    print $output_fh $output;
+
+    return
+}
+
+sub blank_line
+{
+    print $err_fh "\n";
+}
+
+sub error
+{
+    local $\    = "\n";
+
+    my $output  = &format;
+
+    print STDERR $output;
 
     return
 }
@@ -291,7 +317,8 @@ sub sandbox_tmpdir
     )
     or die "Failed create tmpdir: $!.\n";
 
-    output "Sandbox: '$sand_tmp'";
+
+    output 'Workdir: ' . basename $sand_tmp;
     output "Extract: '$tball'";
 
     chdir $sand_tmp
@@ -321,6 +348,98 @@ sub lib_tmpdir
     output "Work dir: '$work_tmp'";
 
     $work_tmp
+}
+
+sub git_sanity
+{
+    my $cmd = join ' ' => 'git', @_;
+
+    chomp( my @output = qx{ $cmd 2>&1 } );
+
+    if( $? )
+    {
+        error "Non-zero exit: '$cmd'", @output;
+        die "$cmd, $?\n";
+    }
+    elsif( @output )
+    {
+        output "$cmd", @output;
+    }
+    else
+    {
+        output "Zero exit, empty output from '$cmd'.";
+        return
+    }
+
+    scalar @output
+}
+
+sub verify_git_env
+{
+    eval
+    {
+        test_git_version
+    }
+    or die "Git not available ($@)\n";
+
+    my $sandbox 
+    = eval
+    {
+        sandbox_tmpdir
+    }
+    or do
+    {
+        error "No tempdir: $@";
+        return
+    };
+
+    eval
+    {
+        # checkout can reasonably get no output;
+        # tag and status must return something.
+
+        git_sanity qw( tag -l           ) or die "No tags.\n";
+        git_sanity qw( checkout HEAD    );
+        git_sanity qw( status .         ) or die "No status.\n";
+    }
+    or do
+    {
+        error $@;
+        return
+    };
+
+    # survival idicates success.
+    # caller gets back the test-specific sandbox dir.
+
+    $sandbox
+}
+
+sub verify_git_branch
+{
+$DB::single = 1;
+
+    my ( $prefix, $perl_v )  = @_;
+
+    chomp( my $found = ( qx{ git branch } )[0] );
+
+    0 <= index( $found, $prefix ),
+    or
+    die "No prefix: '$prefix' in '$found'.\n";
+
+    my $v_rx    = qr{ $prefix (v?[\d._]+) \b }x;
+
+    my ( $tag_v ) = $found =~ $v_rx
+    or die "No verion: '$found'\n";
+
+    my $i   = version->parse( $tag_v  )->numify;
+    my $j   = version->parse( $perl_v )->numify;
+
+    output "Tag ($i) <=> Perl ($j)";
+
+    $i <= $j
+    or die "Invalid tag version: '$i' > '$j'";
+
+    $tag_v
 }
 
 1

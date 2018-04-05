@@ -24,7 +24,7 @@ my $madness = 'Module::FromPerlVer';
 
 *output     = Test::KwikHaks->can( 'output' );
 
-output();
+Test::KwikHaks::blank_line();
 
 SKIP:
 {
@@ -35,28 +35,12 @@ SKIP:
     }
     or BAIL_OUT "Missing Perl Version: $@";
 
-    eval
-    {
-        Test::KwikHaks::test_git_version()
-    }
-    or skip "Git not available ($@)", 1;
-
-    my $sandbox 
+    my $sandbox
     = eval
     {
-        Test::KwikHaks::sandbox_tmpdir()
+        Test::KwikHaks::verify_git_env
     }
-    or skip "No tempdir: $@";
-
-    output( 'Working directory: ' . basename $sandbox );
-
-    my @found = qx{ git tag -l 'perl/*' 2>&1 };
-
-    $?
-    and BAIL_OUT "Failed git tag: non-zero exit $?";
-
-    @found
-    or BAIL_OUT "Failed git tag: no ouptut";
+    or skip 'Git test environment unusable', 1;
  
     my $v_file  = Test::KwikHaks::write_version_file( $perl_v )
     or skip "Failed writing version file.", 1;
@@ -82,40 +66,19 @@ SKIP:
 
     eval
     {
-        chomp( my $found = ( qx{ git branch } )[0] );
-
-        ok 0 < index( $found, $prefix ),
-        "Found: '$prefix' in '$found'"
-        or do
-        {
-            die "No prefix: '$prefix' in '$found'.\n";
-        };
-
-        my $v_rx    = qr{ $prefix (v?[\d._]+) \b }x;
-
-        if
+        my $tag_v
+        = Test::KwikHaks::verify_git_branch
         (
-            my ( $tag_v ) = $found =~ $v_rx
-        )
-        {
-            pass "Tag version: '$tag_v'";
+            $prefix,
+            $perl_v
+        );
 
-            my $i   = version->parse( $tag_v  )->numify;
-            my $j   = version->parse( $perl_v )->numify;
-
-            ok $i <= $j, "Tag ($i) <= Perl ($j)";
-        }
-        else
-        {
-            fail "No version: '$v_rx'";
-            diag "Git status: '$found'";
-        }
-        
-        unlink $v_file;
-
-        1
+        pass "Tag version: '$tag_v' ($prefix, $perl_v)."
     }
-    or fail "Unable to determine branch: $@";
+    or 
+    fail "Unable to determine branch: $@";
+
+    unlink $v_file;
 
     # reset the directory to avoid cruft messages from 
     # git status in initial checks.

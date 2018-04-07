@@ -161,8 +161,8 @@ my $extract_perl_v
 
             $perl_v = $pass1->numify
         }
-        or 
-        die "Unparsable perl version: '$v'\n"
+        or
+        die "Unparsable \$^V: '$v', $@";
     }
     elsif( my $path = $extract->value( 'version_from' ) )
     {
@@ -268,7 +268,16 @@ my @handlerz =
         # acquire running perl version.
 
         my $extract = shift;
-        my $perl_v  = $extract->$extract_perl_v;
+        my $perl_v  
+        = eval
+        {
+            $extract->$extract_perl_v;
+        }
+        or do
+        {
+            print STDERR "Failed: Extract perl version, $@";
+            die
+        };
 
         # lacking an exception, we have a perl version.
 

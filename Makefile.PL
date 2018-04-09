@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.9.1'; 
+my $version = '0.9.2'; 
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.
@@ -97,7 +97,8 @@ WriteMakefile
         # standard distro, particular versions 
         # are unlikely to cause pain.
         #
-        # L::U 1.44 has uniq
+        # L::U 1.44 has uniq, 1.29 has pairs,
+        # 1.50 is current at time of writing.
 
 		qw
         (

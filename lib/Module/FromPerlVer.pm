@@ -243,16 +243,21 @@ DIE
         # the eval will give a better idea of
         # what is going on.
 
-        print STDERR "#  Running Perl: '$^V'"
-        if $verbose;
+        my $vers
+        = ref $^V
+        ? $^V
+        : sprintf '%vd', $^V
+        ;
+
+        print STDERR "#  Running Perl: '$vers' ($^V)";
 
         $perl_v 
         = eval
         {
-            version->parse( $^V )->numify
+            version->parse( $vers )->numify
         }
         or
-        die "Unparsable \$^V: '$^V', $@.\n";
+        die "Unparsable perl version: '$vers' ($^V), $@";
     }
 
     # at this point the version has been parsed and numified.

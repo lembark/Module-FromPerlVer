@@ -1,3 +1,9 @@
+-   v0.9.2 Mon Apr  9 10:29:40 CDT 2018
+
+    Deal with non-ref $^V in 5.8 via sprintf '%vd'.
+    Add boilerplate output at parse time to show what is being
+    processed.
+
 -   v0.9.1  
 
     Add boilerplate to dump $^V if version->parse failes

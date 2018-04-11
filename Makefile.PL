@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.9.2'; 
+my $version = '0.9.3'; 
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.

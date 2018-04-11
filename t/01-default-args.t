@@ -38,12 +38,19 @@ eval
 or
 fail "Failed import: $@";
 
+my $vers
+= ref $^V
+? $^V
+: sprintf '%vd', $^V
+;
+
 $perl_v
 = eval
 {
-    version->parse( $^V )->numify
+
+    version->parse( $vers )->numify
 }
-or BAIL_OUT "Failed parse: \$^V: '$^V', $@";
+or BAIL_OUT "Failed parse: '$vers', $@";
 
 for
 (

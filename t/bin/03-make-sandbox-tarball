@@ -38,7 +38,7 @@ rm -rf *;
 git add .;
 git commit -m'empty directory';
 
-tar cf git.tar .git;
+tar cf .git.tar .git;
 
 # push fake sandbox into module's git.
 # .gitignore avoids issues with

@@ -95,7 +95,7 @@ lib/Module/FromPerlVer/Util.pm
 
 # tarball to generate the test sandbox.
 
-sandbox/git.tar
+sandbox/.git.tar
 
 # fixed tests
 

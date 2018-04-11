@@ -51,7 +51,7 @@ or do
 };
 
 -e $_ or BAIL_OUT "Botched distro: missing '$_'."
-for qw( version sandbox sandbox/git.tar );
+for qw( version sandbox sandbox/.git.tar );
 
 done_testing;
 __END__

@@ -1,5 +1,6 @@
 use 5.008;
 use lib qw( lib t/lib );
+use version;
 
 use Test::More;
 use Archive::Tar;
@@ -11,6 +12,18 @@ use lib( "$Bin/../../lib", "$Bin/../lib" );
 use Test::KwikHaks;
 
 *output     = Test::KwikHaks->can( 'output' );
+
+use_ok 'List::Util'
+or BAIL_OUT  "Unavailable module 'List::Util'";
+
+for my $found ( List::Util->VERSION )
+{
+    my $expect  = version->parse( '1.50' )->numify;
+    my $compare = version->parse( $found )->numfiy;
+
+    $compare >= $expect
+    or BAIL_OUT "Unusable List::Util version: '$found' ($expect)";
+}
 
 for my $madness
 (

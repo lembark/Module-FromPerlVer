@@ -12,7 +12,7 @@ use version;
 
 use Cwd                     qw( cwd                     );
 use File::Basename          qw( basename                );
-use File::Copy::Recursive   qw( dircopy                 );
+use File::Copy::Recursive::Reduced 0.002 qw( dircopy    );
 use File::Find              qw( find                    );
 use FindBin                 qw( $Bin                    );
 use List::Util              qw( first                   );
@@ -1122,7 +1122,7 @@ This does the parsing of version numbers from code and
 dirs. The POD incudes examples of both parsing and sorting
 Perl versions.
 
-=item File::Copy::Recursive
+=item File::Copy::Recursive::Reduced
 
 Describes how the files are copied by Dir.pm.
 

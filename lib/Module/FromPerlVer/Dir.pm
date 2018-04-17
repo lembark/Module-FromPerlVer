@@ -11,7 +11,7 @@ use parent  qw( Module::FromPerlVer::Extract );
 use Carp                    qw( croak               );
 use Cwd                     qw( getcwd              );
 use File::Basename          qw( basename dirname    );
-use File::Copy::Recursive   qw( dircopy             );
+use File::Copy::Recursive::Reduced 0.002 qw( dircopy);
 use File::Find              qw( find                );
 use FindBin                 qw( $Bin                );
 use List::Util              qw( first               );

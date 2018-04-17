@@ -12,7 +12,7 @@ use Archive::Tar;
 
 use Cwd                     qw( getcwd          );
 use File::Basename          qw( basename        );
-use File::Copy::Recursive   qw( dircopy         );
+use File::Copy::Recursive::Reduced 0.002 qw(dircopy );
 use FindBin                 qw( $Bin            );
 use List::Util              qw( first           );
 use Symbol                  qw( qualify_to_ref  );

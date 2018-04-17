@@ -109,7 +109,7 @@ WriteMakefile
             Archive::Tar            0
             Carp                    0
             File::Basename          0
-            File::Copy::Recursive   0
+            File::Copy::Recursive::Reduced   0.002
             File::Find              0
             File::Spec::Functions   0
             FindBin                 0

@@ -11,10 +11,14 @@ use parent  qw( Module::FromPerlVer::Extract );
 use Carp                    qw( croak               );
 use Cwd                     qw( getcwd              );
 use File::Basename          qw( basename dirname    );
-use File::Copy::Recursive   qw( dircopy             );
 use File::Find              qw( find                );
 use FindBin                 qw( $Bin                );
 use List::Util              qw( first               );
+
+# rt.cpan.org #125104
+# use File::Copy::Recursive   qw( dircopy             );
+
+use File::Copy::Recursive::Reduced   qw( dircopy );
 
 use File::Spec::Functions
 qw

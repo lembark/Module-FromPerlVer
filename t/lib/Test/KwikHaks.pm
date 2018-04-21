@@ -171,7 +171,7 @@ for
 (
     [ sandbox_path  => 'sandbox'            ],
     [ version_path  => 'version'            ],
-    [ tball_path    => 'sandbox/git.tar'    ],
+    [ tball_path    => 'sandbox/.git.tar'   ],
 )
 {
     my ( $name, $rel_path ) = @$_;

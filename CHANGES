@@ -1,3 +1,17 @@
+-   v0.9.6 Sat Apr 21 16:49:03 CDT 2018
+
+    
+
+
+-   v0.9.5 Wed Apr 18 09:44:19 CDT 2018
+
+    Pre-clean directory in 11-*.t in case of repeated runs 
+    or failure of cleanup in 10-*.t.
+
+    Replace File::Copy::Recursive (see rt.cpan.org #125104).
+
+    Correct typo in test looking for git.tar.
+
 -   v0.9.4 Fri Apr 13 11:58:35 CDT 2018
 
     Add explicit check for List::Util 1.50 in 00*t. 

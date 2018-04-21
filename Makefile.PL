@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 $\          = "\n";
 
 my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.9.4'; 
+my $version = '0.9.5'; 
 
 ########################################################################
 # various things that may depend on the ExtUtils::MakeMaker version.
@@ -99,17 +99,19 @@ WriteMakefile
         #
         # L::U 1.44 has uniq, 1.29 has pairs,
         # 1.50 is current at time of writing.
+        #
+        # File::Copy::Recursive   0
 
 		qw
         (
             version                 0.9918
-            Cwd                     3.73
-            List::Util              1.50
+            Cwd                     3.073
+            List::Util              1.050
+            File::Copy::Recursive::Reduced   0.002
 
             Archive::Tar            0
             Carp                    0
             File::Basename          0
-            File::Copy::Recursive   0
             File::Find              0
             File::Spec::Functions   0
             FindBin                 0

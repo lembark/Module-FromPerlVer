@@ -47,7 +47,6 @@ my $vers
 $perl_v
 = eval
 {
-
     version->parse( $vers )->numify
 }
 or BAIL_OUT "Failed parse: '$vers', $@";

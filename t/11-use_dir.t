@@ -8,6 +8,11 @@ my $madness = 'Module::FromPerlVer';
 use_ok $madness => qw( use_dir 1 no_copy 1 )
 or BAIL_OUT "$madness is not usable.";
 
+# check that there are no leftover files from
+# repeated runs.
+
+$madness->cleanup;
+
 my $filz    = $madness->source_files;
 
 note "Source files:\n", explain $filz;

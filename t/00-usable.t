@@ -19,7 +19,7 @@ or BAIL_OUT  "Unavailable module 'List::Util'";
 for my $found ( List::Util->VERSION )
 {
     my $expect  = version->parse( '1.50' )->numify;
-    my $compare = version->parse( $found )->numfiy;
+    my $compare = version->parse( $found )->numify;
 
     $compare >= $expect
     or BAIL_OUT "Unusable List::Util version: '$found' ($expect)";
@@ -59,12 +59,11 @@ eval
 }
 or do
 {
-    fail 'No git version.';
-    diag "No git version: $@";
+    diag "No git version found: $@";
 };
 
 -e $_ or BAIL_OUT "Botched distro: missing '$_'."
-for qw( version sandbox sandbox/.git.tar );
+for qw( ./version ./sandbox ./sandbox/.git.tar );
 
 done_testing;
 __END__

@@ -39,7 +39,10 @@ my $exists
     : \@resultz
 };
 
-unlink @$filz;
+# cleanup prior to running in case prior
+# tests left cruft behind.
+
+$madness->cleanup();
 
 my $prior   = $exists->( 'Prior' );
 
@@ -61,6 +64,10 @@ for @copy;
 $madness->cleanup;
 
 my $after   = $exists->( 'After' );
+
+# after the cleanup the filesystem should look
+# as it did on the way in. any existing dir's 
+# will still be there but files should be gone.
 
 cmp_deeply $after, $prior, 'Cleanup';
 

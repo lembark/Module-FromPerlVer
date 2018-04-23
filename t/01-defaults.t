@@ -1,7 +1,6 @@
 use 5.006;
 
 use Test::More;
-use FindBin::libs;
 use File::Basename   qw( basename );
 
 delete $ENV{ COMPATIBLE_VERSION };

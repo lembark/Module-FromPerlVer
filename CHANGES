@@ -1,4 +1,9 @@
---  v0.010  Sun Apr 22 19:08:47 CDT 2018
+--  v0.10.1
+
+    Add back file-based tests for a variety of version 
+    strings.
+
+--  v0.10  Sun Apr 22 19:08:47 CDT 2018
 
     There is simply no way to get a consistent shell interface to 
     git across different platforms; every fix for one breaks another.

@@ -1,0 +1,11 @@
+--  v0.010  Sun Apr 22 19:08:47 CDT 2018
+
+    There is simply no way to get a consistent shell interface to 
+    git across different platforms; every fix for one breaks another.
+    Going back to the original approach of supporting only the 
+    perl-version dir's, which has reliably worked throughout.
+
+--  v0.0.1  Sun Feb 18 14:19:59 CST 2018
+
+    Initial kwikhak... ah... er... "relase", yes,
+    that's the word release.

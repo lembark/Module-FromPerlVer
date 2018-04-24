@@ -84,7 +84,7 @@ my @handlerz =
                     if
                     (
                         my ( $min_v )
-                        = m{ \b use \s+ (v?5[.][\d_]*)}x
+                        = m{ \b use \s+ (v?5[.][.\d_]*)}x
                     )
                     {
                         $perl_v 
@@ -95,7 +95,7 @@ my @handlerz =
                     elsif
                     (
                         my ( $max_v ) 
-                        = m{ \b no  \s+ (v?5[.][\d_]*)}x
+                        = m{ \b no  \s+ (v?5[.][.\d_]*)}x
                     )
                     {
                         $perl_v
@@ -205,6 +205,7 @@ my @handlerz =
 
         # klutzy as this looks it beats a sort on $_->[0]
         # followed by first.
+
 
         my $found
         = reduce

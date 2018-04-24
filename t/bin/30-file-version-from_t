@@ -44,7 +44,7 @@ or BAIL_OUT "Failed create tmpdir: $@";
 # test reading version from "use" or "no".
 ########################################################################
 
-output();
+output( 'foobar' );
 
 delete $ENV{ PERL_VERSION };
 

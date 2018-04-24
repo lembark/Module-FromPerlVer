@@ -67,11 +67,11 @@ sub format
     {
         my $head    = shift;
 
-        join "\n#  " => "# $head:", @_
+        join "\n#  " => '', "$head:", @_
     }
     elsif( @_ )
     {
-        "# $_[0]";
+        "\n# $_[0]";
     }
     else
     {
@@ -81,11 +81,10 @@ sub format
 
 sub output
 {
-    local $\    = "\n";
-
     my $output  = &format;
 
     print $output_fh $output;
+    print "\n";
 
     return
 }
@@ -158,7 +157,7 @@ sub search_bin
         -e $path
         or next;
 
-        output( "Test $base: '$path'." );
+        output( "Search: '$base' ($path)" );
 
         return $path
     }
@@ -233,7 +232,7 @@ sub mkdir_if
 {
     my $path = catdir @_;
 
-    output( "mkdir_if: '$path'" );
+#    output( "mkdir_if: '$path'" );
 
     -d $path            ? output( "Existing: '$path'." )
     : mkdir $path, 0777 ? output( "Created:  '$path'." )

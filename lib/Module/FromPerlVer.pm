@@ -10,13 +10,25 @@ use 5.006;
 use strict;
 use version;
 
-use Cwd                     qw( cwd             );
+use Cwd                     qw( getcwd          );
 use File::Basename          qw( basename        );
 use File::Copy::Recursive   qw( dircopy         );
 use File::Find              qw( find            );
+use File::Spec::Functions   qw( &catpath        );
 use FindBin                 qw( $Bin            );
-use List::Util              qw( first           );
+use List::Util              qw( first reduce    );
 use Symbol                  qw( qualify_to_ref  );
+
+use File::Spec::Functions
+qw
+(
+    &abs2rel
+    &rel2abs
+
+    &catdir
+    &catpath
+    &splitpath
+);
 
 ########################################################################
 # package variables & sanity checks
@@ -25,6 +37,8 @@ use Symbol                  qw( qualify_to_ref  );
 our $VERSION    = '0.0.1';
 
 my $default_d   = 'version';
+
+my $cwd         = getcwd;
 
 ########################################################################
 # utility subs
@@ -40,9 +54,9 @@ my @handlerz =
         my $path    = $argz->{ version_from } || '';
         my $perl_v  = '';
 
-        if( my $value = $ENV{ COMPATIBLE_VERSION } )
+        if( my $value = $ENV{ PERL_VERSION } )
         {
-            warn "Overriding '$path' with '$value' from COMPATIBLE_VERSION.\n"
+            warn "Overriding '$path' with PERL_VERSION='$value'.\n"
             if $path;
 
             $perl_v = version->parse( $value )->numify
@@ -51,6 +65,8 @@ my @handlerz =
         }
         elsif( $path )
         {
+$DB::single = 1;
+
             -e $path or die "Bogus version_from: non-existant '$path'\n";
             -f _     or die "Bogus version_from: non-file     '$path'\n";
             -s _     or die "Bogus version_from: zero-size    '$path'\n";
@@ -67,10 +83,12 @@ my @handlerz =
 
                 first
                 {
+$DB::single = 1;
+
                     if
                     (
                         my ( $min_v )
-                        = m{ \buse \s+ (v? 5[.] +?) \s* ; }
+                        = m{ \b use \s+ (v?5[.][\d_]*)}x
                     )
                     {
                         $perl_v 
@@ -81,7 +99,7 @@ my @handlerz =
                     elsif
                     (
                         my ( $max_v ) 
-                        = m{ \bno  \s+ (v? 5[.] +?) \s* ; }
+                        = m{ \b no  \s+ (v?5[.][\d_]*)}x
                     )
                     {
                         $perl_v
@@ -93,6 +111,10 @@ my @handlerz =
                     {
                         ''
                     }
+                }
+                grep
+                {
+                    /\S/
                 }
                 readline $fh
                 or
@@ -120,7 +142,7 @@ my @handlerz =
             $perl_v
         };
 
-        print "# Perl version: '$perl_v'";
+        print "# Perl version: '$perl_v'\n";
 
         return
     },
@@ -132,33 +154,40 @@ my @handlerz =
         my $argz    = shift;
         my $dir     = $argz->{ version_dir } || $default_d;
 
+        my ( $vol, $dir )   = splitpath $dir, 1;
+
+        # $Bin/$dir simplifies testing by locating './t/version'
+        # for anything running in ./t using only the default.
+
         my $path
         = first
         {
-            -e 
+            -d
+        }
+        map
+        {
+            my $d   = catdir $_, $dir;
+
+            catpath $vol, $d, ''
         }
         (
-            $dir        ,
-            "$Bin/$dir" ,
-            "./$dir"    ,
+            '',
+            $cwd,
+            $Bin,
         )
-        or die "Bogus version_dir: Non-existant: '$dir' ($Bin)";
+        or
+        die "Bogus version_dir: Non-existant: '$dir'.\n";
 
-        for my $cwd ( cwd )
-        {
-            # convert $path to relative.
+        # first, above, guarantees that this is the last
+        # dir examined. make the final sanity checks.
 
-            my $i   = length $cwd;
-
-            index $path, "$cwd/"
-            or
-            substr $path, 0, $i, '.'
-        }
-
-        -e $path    or die "Bogus version_dir: non-existant '$path'";
-        -d _        or die "Bogus version_dir: non-dir      '$path'";
         -r _        or die "Bogus version_dir: non-readable '$path'";
+        -w _        or die "Bogus version_dir: non-writeable '$path'";
         -x _        or die "Bogus version_dir: non-execable '$path'";
+
+        index $path, $cwd
+        or
+        $path   = abs2rel $path, $cwd;
 
         my @found   = glob "$path/*"
         or die "Botchd version_dir: '$path' is empty directory.\n";
@@ -166,7 +195,7 @@ my @handlerz =
         *{ qualify_to_ref 'version_dir' }
         = sub { $path };
 
-        print "# Version directory: '$path'";
+        print "# Version directory: '$path'\n";
 
         return
     },
@@ -178,30 +207,49 @@ my @handlerz =
         my $perl_v      = perl_version();
         my $version_d   = version_dir();
 
-        my $source_d
-        = first
-        {
-            $_
-        }
-        map
-        {
-            $perl_v >= $_->[0] 
-            ? $_->[1]
-            : ()
-        }
-        sort
-        {
-            $b->[0] <=> $a->[0]
-        }
-        map
-        {
-            my $dir_v   
-            = version->parse( basename $_ )->numify;
+        # klutzy as this looks it beats a sort on $_->[0]
+        # followed by first.
 
-            [ $dir_v, $_ ]
+        my $found
+        = reduce
+        {
+            # i.e., from any dir with version <= perl_v
+            # prefer the one with the highest verison.
+            # equality handles differences in version 
+            # format colliding on a single numified value.
+
+            $perl_v < $b->[0]
+            ? $a
+            : $a->[0] >= $b->[0]
+            ? $a
+            : $b
         }
-        glob "$version_d/*"
-        ;
+        (
+            # sentinel allows evaluating all version dir's
+            # for <= $perl_v.
+
+            [ 0, '' ],
+            map
+            {
+                my $dir_v   
+                = eval
+                {
+                    version->parse( basename $_ )->numify
+                }
+                or warn "Unusable version dir: '$_', not parsable.\n";
+
+                $dir_v
+                ? [ $dir_v, $_ ]
+                : ()
+            }
+            glob "$version_d/*"
+        );
+
+        $found->[0]
+        or 
+        die "Failed version dir: all '$version_d' > $perl_v\n";
+
+        my $source_d    = $found->[ -1 ];
 
         *{ qualify_to_ref 'source_dir' }
         = sub
@@ -209,9 +257,77 @@ my @handlerz =
             $source_d
         };
 
-        print "# Source directory:  '$source_d'";
+        print "# Source directory:  '$source_d'\n";
 
         return
+    },
+
+    sub
+    {
+        # set the destination directory.
+
+        my $argz    = shift;
+        my $dest_d  = $argz->{ dest_dir } || $cwd;
+
+        -e $dest_d  or die "Botched dest_dir: non-existant '$dest_d'";
+        -d _        or die "Botched dest_dir: non-directory '$dest_d'";
+        -r _        or die "Botched dest_dir: non-readable '$dest_d'";
+        -w _        or die "Botched dest_dir: non-writeable '$dest_d'";
+
+        index $dest_d, $cwd
+        or
+        $dest_d     = abs2rel $dest_d, $cwd;
+
+        # looks minimally usable...
+
+        *{ qualify_to_ref 'dest_dir' }
+        = sub
+        {
+            $dest_d
+        };
+
+        print "# Dest dir: '$dest_d'.\n";
+
+        return
+    },
+
+    sub
+    {
+        *{ qualify_to_ref 'dest_paths' }
+        = sub
+        {
+            my ( $dst_v, $dst_d ) = splitpath dest_dir(), 1;
+            my ( $filz, $dirz   ) = source_paths();
+
+            my @dst_filz
+            = map
+            {
+                my ( undef, $src_d, $base ) = splitpath $_;
+
+                catpath $dst_v, catdir( $dst_d, $src_d ), $base;
+            }
+            @$filz;
+
+            my @dst_dirz
+            = map
+            {
+                my ( undef, $src_d, undef ) = splitpath $_, 1;
+
+                catpath $dst_v, catdir $dst_d, $src_d;
+            }
+            @$dirz;
+
+            for( @dst_filz, @dst_dirz )
+            {
+                index $_, $cwd
+                and
+                $_  = abs2rel $_, $cwd
+            }
+
+            wantarray
+            ? ( \@dst_filz, \@dst_dirz )
+            :   \@dst_filz
+        };
     },
 
     sub 
@@ -231,10 +347,8 @@ my @handlerz =
         {
             my $path    = $File::Find::name;
 
-            $path ne $source_d
-            or return;
-
-            my $rel     = '.' . substr $path, $n;
+            $path eq $source_d
+            and return;
 
             my $i
             = -d $_
@@ -242,7 +356,7 @@ my @handlerz =
             : 0
             ;
 
-            push @{ $pathz[ $i ] }, $rel;
+            push @{ $pathz[ $i ] }, abs2rel $path, $source_d;
         },
         $source_d;
 
@@ -251,7 +365,7 @@ my @handlerz =
         @{ $pathz[0] }
         or warn "No input files found: '$source_d'";
 
-        *{ qualify_to_ref 'source_files' }
+        *{ qualify_to_ref 'source_paths' }
         = sub
         {
             wantarray
@@ -260,7 +374,7 @@ my @handlerz =
         };
 
         local $,    = "\n#\t";
-        print '# Source files:', @{ $pathz[0] };
+        print '# Source files:', @{ $pathz[0] }, "\n";
 
         return
     },
@@ -270,7 +384,7 @@ my @handlerz =
         *{ qualify_to_ref 'cleanup' }
         = sub
         {
-            my ( $filz, $dirz ) = source_files();
+            my ( $filz, $dirz ) = dest_paths();
 
             unlink @$filz;
 
@@ -294,25 +408,27 @@ my @handlerz =
 
     sub
     {
-        my ( $filz, $dirz ) = source_files();
+        my ( $filz, $dirz ) = source_paths();
+        my $dest_d          = dest_dir();
         my $expect  = 1 + @$filz + @$dirz;
 
         *{ qualify_to_ref 'copy_source_dir' }
         = sub
         {
-            my $dir     = source_dir();
-            my $found   = dircopy $dir, '.';
+            my $src     = source_dir();
+            my $dst     = dest_dir();
+            my $found   = dircopy $src, $dst;
             
-            print "# Copied: $found files from '$dir'";
+            print "# Copied: $found files from '$src'\n";
 
             $found != $expect
             and
-            print "# Oddity: mismatched count $found != $expect.";
+            warn "# Oddity: mismatched count $found != $expect.\n";
 
             $found
         };
 
-        print "# Expect: $expect files to be copied.";
+        print "# Expect: $expect files to be copied.\n";
 
         return
     }
@@ -324,8 +440,6 @@ my @handlerz =
 
 sub import
 {
-    local $\    = "\n";
-
     my ( undef, %argz ) = @_;
 
     for my $sub ( @handlerz )
@@ -337,7 +451,7 @@ sub import
     # still alive the copy function has been installed.
     #
     # caller can use cleanup() to remove files copied or 
-    # source_files() to get a list of them.
+    # source_paths() to get a list of them.
     #
     # this returns the count from File::Copy::Recursive,
     # which should be true if anything was found to copy.
@@ -401,7 +515,7 @@ Module::FromPerlVer - install modules compatible with the running perl.
     # versions of modules against the running version 
     # (e.g., validating experimental features).
 
-    $ COMPATIBLE_VERSION='5.024002' perl Makefile.PL;
+    $ PERL_VERSION='5.024002' perl Makefile.PL;
 
     # use a file to determine the perl version.
     # this takes the use-ed version from the file
@@ -441,7 +555,7 @@ Module::FromPerlVer - install modules compatible with the running perl.
     use Module::FromPerlVer   qw( no_copy 1 );
 
 
-    my ( $filz, $dirz ) = Module::FromPerlVer::source_files;
+    my ( $filz, $dirz ) = Module::FromPerlVer::source_paths;
 
     Module::FromPerlVer->copy_source_dir;
 
@@ -490,7 +604,7 @@ examples are README, MANIFEST, Changes, ./lib, ./t,
 
 Using the module in setup code (e.g., Makefile.PL):
 
-    use Devel::PerlCompatiable;
+    use Module::FromPerlVer
 
 will look in the ./version directory, sort the subdir's 
 in numerically decreasing order by version (see version)
@@ -519,7 +633,7 @@ module's compatible directory are:
 
 =over 4
 
-=item $ENV{ COMPATIBLE_VERSION }
+=item $ENV{ PERL_VERSION }
 
 Any true value of  will be used. If this is supplied with
 the "version_from" argument a warning will be issued and
@@ -553,9 +667,9 @@ specific version of perl:
 
     for i in ./version/*
     do
-        COMPATIBLE_VERSION="$(basename $i)" \
-        $perl Makefile.PL                   &&
-        make all test                       ;
+        PERL_VERSION="$(basename $i)"   \
+        $perl Makefile.PL               &&
+        make all test                   ;
     done
 
 =item use Module::FromPerlVer ( version_from => $path );
@@ -645,7 +759,7 @@ directory:
     ./version/5.006001
     ./version/v5.24.2
 
-=item source_files()
+=item source_paths()
 
 Used in a scalar context this returns an arrayref of relative
 paths to files copied from the source_dir into the working 
@@ -655,6 +769,25 @@ Used in a list context it returns two arrayrefs: one of the
 files one of the directories. The former is used with unlink
 in cleanup to remove only the files that were copied; the 
 latter is used to rmdir empty directories.
+
+=item dest_dir()
+
+Note: Used mainly for testing.
+
+Returns the dest_dir used to copy source_paths.
+
+It mainly allows parallel testing without the tests overwriting one 
+another's output. Might also be useful to install files in a blib 
+directory during testing.
+
+=item dest_paths()
+
+Note: Used mainly for testing.
+
+Returns the source_paths() with the destination directory
+prefixed. In the default case this will map "./version/X/lib/foo.pm"
+to "./lib/foo.pm". If the dest_dir is, say, a tempdir then the
+dest paths will look like "./sandbox/10-frobnicate-asdf/lib/foo.pm".
 
 =item copy_source_dir()
 

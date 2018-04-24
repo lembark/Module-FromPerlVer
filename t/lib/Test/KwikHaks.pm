@@ -25,6 +25,7 @@ qw
     &splitdir
     &catpath
     &catdir
+    &abs2rel
 );
 
 ########################################################################
@@ -54,7 +55,7 @@ my $output_fh
 : $out_fh
 ;
 
-mkdir_if( $Bin => 'sandbox' );
+mkdir_if( search_bin( 't' ),  'sandbox' );
 
 ########################################################################
 # exported utilities
@@ -199,7 +200,12 @@ sub write_version_file
         if
         (
             my ( $fh, $path ) 
-            = tempfile 'perl_version.XXXX'
+            = tempfile 
+            (
+                'perl_version.XXXX' =>
+                DIR     => sandbox_path(),
+                UNLINK  => 1,
+            )
         )
         {
             print $fh "$use $perl_v;\n"
@@ -208,7 +214,7 @@ sub write_version_file
             close $fh
             or die "Failed close: '$path', $!\n";
 
-            $path
+            abs2rel $path, getcwd
         }
         else
         {
@@ -320,17 +326,9 @@ sub work_dir
     )
     or die "Failed create tmpdir: $!.\n";
 
-    if( index $work_tmp, $cwd )
-    {
-        # leave it absolute
-    }
-    else
-    {
-        my $l   = length $cwd;
-
-        substr $work_tmp, 0, $l, '.';
-    }
-
+    index $work_tmp, $cwd
+    or
+    $work_tmp   = abs2rel $work_tmp, $cwd;
 
     # alive at this point => paths are usable.
 

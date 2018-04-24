@@ -3,7 +3,7 @@
 # housekeeping
 ########################################################################
 
-use 5.6.0;
+use 5.008;
 use strict;
 
 use version;
@@ -30,6 +30,9 @@ use Test::KwikHaks;
 
 $\    = "\n";
 
+my $sd  = Test::KwikHaks->can( 'search_bin' )
+or die "Botched Test::KwikHaks: cannot 'search_bin'.\n";
+
 my $md  = Test::KwikHaks->can( 'mkdir_if' )
 or die "Botched Test::KwikHaks: cannot 'mkdir_if'.\n";
 
@@ -41,8 +44,13 @@ or die "Botched Test::KwikHaks: cannot 'rm_rf'.\n";
 
 *output = Test::KwikHaks->can( 'output' );
 
-my $v_base      = 'version';
+if( my $found = $sd->( 'dynamic' ) )
+{
+    $rm->( $found );
+}
 
+my $test_d      = $sd->( 't' );
+my $work_d      = $md->( $test_d => 'version' );
 
 my @mod_specz = 
 (
@@ -71,7 +79,7 @@ END
 END
     ],
     [
-        # easier to parse use for validatio of
+        # easier to parse use for validation of
         # the module parser.
 
         qw( etc dat ),
@@ -105,8 +113,6 @@ sub make_v_file
     # normally disk-full issues won't show up until 
     # the close can't flush the buffer; need to check 
     # both.
-    #
-    # note: lack of separator between $fh & $mod_fmt.
 
     my $text    = sprintf $format => $name, $use, $ver;
 
@@ -124,20 +130,10 @@ sub make_v_file
 
 # i.e., start in ./t
 
-my $work_d  = "$Bin/../..";
-
 chdir $work_d
 or die "Failed chdir: $!.\n";
 
 output( 'Working directory: ' . getcwd );
-
-$rm->( $v_base );
-
-$work_d     = $md->( $work_d, $v_base )
-or die "Failed mkdir: '$v_base', $!.\n";
-
-chdir $work_d
-or die "Failed chdir: '$work_d', $!";
 
 for my $v_string ( $gv->() )
 {

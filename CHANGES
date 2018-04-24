@@ -3,6 +3,10 @@
     Add back file-based tests for a variety of version 
     strings.
 
+    Replace join on '/' with File::Spec::Functions to allow
+    use on systems with volumes -- anyone with VMS kindly 
+    test this for me.
+
 --  v0.10  Sun Apr 22 19:08:47 CDT 2018
 
     There is simply no way to get a consistent shell interface to 

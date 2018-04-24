@@ -6,9 +6,11 @@
 use 5.006;
 use strict;
 
-use File::Basename  qw( basename dirname    );
-use List::MoreUtils qw( zip                 );
-use List::Util      qw( pairmap             );
+use Cwd                     qw( getcwd              );
+use File::Basename          qw( basename dirname    );
+use File::Spec::Functions   qw( abs2rel             );
+use List::MoreUtils         qw( zip                 );
+use List::Util              qw( pairmap             );
 
 use FindBin qw( $Bin );
 use lib "$Bin/../lib";
@@ -20,6 +22,9 @@ use Test::KwikHaks;
 
 $\      = "\n";
 
+my $sd  = Test::KwikHaks->can( 'search_bin' )
+or die "Botched Test::KwikHaks: cannot 'search_bin'.\n";
+
 my $md  = Test::KwikHaks->can( 'mkdir_if' )
 or die "Botched Test::KwikHaks: cannot 'mkdir_if'.\n";
 
@@ -29,12 +34,18 @@ or die "Botched Test::KwikHaks: cannot 'generate_versions'.\n";
 my $rm  = Test::KwikHaks->can( 'rm_rf' )
 or die "Botched Test::KwikHaks: cannot 'rm_rf'.\n";
 
-my $glob    = '../bin/*_t';
-
-my $work_d  = "$Bin/..";
-my $d_base  = 'dynamic';
-
 *output     = Test::KwikHaks->can( 'output' );
+
+if( my $found = $sd->( 'dynamic' ) )
+{
+    $rm->( $found );
+}
+
+my $test_d      = $sd->( 't' );
+my $vers_d      = $sd->( 'version' );
+my $work_d      = $md->( $test_d => 'dynamic' );
+
+my $glob        = "$test_d/bin/*_t";
 
 ########################################################################
 # symlink all of the test templates to version-specific paths.
@@ -45,12 +56,7 @@ my $d_base  = 'dynamic';
 chdir $work_d
 or die "Failed chdir: $work_d, $!";
 
-$rm->( $d_base );
-
-$md->( $work_d => $d_base );
-
-chdir $d_base
-or die "Failed chdir: '$d_base', $!";
+my $cwd     = getcwd;
 
 my @testz   = glob $glob
 or die "Botched $0: no files like '$glob'.\n";
@@ -59,7 +65,9 @@ output( Tests => @testz );
 
 for my $path ( @testz )
 {
-    output( "Link: '$path'." );
+    my $rel = abs2rel $path, $cwd;
+
+    output( "Link: '$rel'." );
     
     my $base    = basename $path => '_t';
     my $pref    
@@ -94,7 +102,7 @@ for my $path ( @testz )
             warn "Failed unlink: '$link', $!";
         }
 
-        symlink $path => $link
+        symlink $rel => $link
         or warn "Failed symlink: '$link', $!";
 
         -e $link

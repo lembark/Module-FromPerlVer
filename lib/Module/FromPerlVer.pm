@@ -65,8 +65,6 @@ my @handlerz =
         }
         elsif( $path )
         {
-$DB::single = 1;
-
             -e $path or die "Bogus version_from: non-existant '$path'\n";
             -f _     or die "Bogus version_from: non-file     '$path'\n";
             -s _     or die "Bogus version_from: zero-size    '$path'\n";
@@ -83,8 +81,6 @@ $DB::single = 1;
 
                 first
                 {
-$DB::single = 1;
-
                     if
                     (
                         my ( $min_v )
@@ -152,9 +148,9 @@ $DB::single = 1;
         # exract version parent directory
 
         my $argz    = shift;
-        my $dir     = $argz->{ version_dir } || $default_d;
+        my $vers_d  = $argz->{ version_dir } || $default_d;
 
-        my ( $vol, $dir )   = splitpath $dir, 1;
+        my ( $vol, $dir )   = splitpath $vers_d, 1;
 
         # $Bin/$dir simplifies testing by locating './t/version'
         # for anything running in ./t using only the default.
@@ -291,45 +287,6 @@ $DB::single = 1;
         return
     },
 
-    sub
-    {
-        *{ qualify_to_ref 'dest_paths' }
-        = sub
-        {
-            my ( $dst_v, $dst_d ) = splitpath dest_dir(), 1;
-            my ( $filz, $dirz   ) = source_paths();
-
-            my @dst_filz
-            = map
-            {
-                my ( undef, $src_d, $base ) = splitpath $_;
-
-                catpath $dst_v, catdir( $dst_d, $src_d ), $base;
-            }
-            @$filz;
-
-            my @dst_dirz
-            = map
-            {
-                my ( undef, $src_d, undef ) = splitpath $_, 1;
-
-                catpath $dst_v, catdir $dst_d, $src_d;
-            }
-            @$dirz;
-
-            for( @dst_filz, @dst_dirz )
-            {
-                index $_, $cwd
-                and
-                $_  = abs2rel $_, $cwd
-            }
-
-            wantarray
-            ? ( \@dst_filz, \@dst_dirz )
-            :   \@dst_filz
-        };
-    },
-
     sub 
     {
         # locate files to copy
@@ -350,13 +307,18 @@ $DB::single = 1;
             $path eq $source_d
             and return;
 
-            my $i
-            = -d $_
+            my $is_dir  
+            = -d 
             ? 1
             : 0
             ;
 
-            push @{ $pathz[ $i ] }, abs2rel $path, $source_d;
+            my ( $vol, $dir, $base )
+            = splitpath $path, $is_dir;
+
+            my $sub_d   = abs2rel $dir, $source_d;
+
+            push @{ $pathz[ $is_dir ] }, catpath $vol, $sub_d, $base;
         },
         $source_d;
 
@@ -377,6 +339,46 @@ $DB::single = 1;
         print '# Source files:', @{ $pathz[0] }, "\n";
 
         return
+    },
+
+    sub
+    {
+        my ( $dst_v, $dst_d )   = splitpath dest_dir(), 1;
+        my ( $filz, $dirz   )   = source_paths();
+
+        my @dst_filz
+        = map
+        {
+            my ( undef, $src_d, $base ) = splitpath $_;
+
+            catpath $dst_v, catdir( $dst_d, $src_d ), $base;
+        }
+        @$filz;
+
+        my @dst_dirz
+        = map
+        {
+            my ( undef, $dir, undef ) = splitpath $_, 1;
+
+            catpath $dst_v, catdir( $dst_d, $dir ), '';
+        }
+        @$dirz;
+
+        for( @dst_filz, @dst_dirz )
+        {
+            index $_, $cwd
+            and
+            $_  = abs2rel $_, $cwd
+        }
+
+        *{ qualify_to_ref 'dest_paths' }
+        = sub
+        {
+
+            wantarray
+            ? ( \@dst_filz, \@dst_dirz )
+            :   \@dst_filz
+        };
     },
 
     sub

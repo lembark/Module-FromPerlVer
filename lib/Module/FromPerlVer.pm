@@ -34,7 +34,7 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = '0.0.1';
+our $VERSION    = version->parse( 'v0.2.0' )->numify;
 
 my $default_d   = 'version';
 

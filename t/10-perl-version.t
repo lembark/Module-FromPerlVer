@@ -1,5 +1,7 @@
 use 5.008;
-use lib qw( lib t/lib );
+use strict;
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use Test::More;
 use Test::Deep;
@@ -11,6 +13,7 @@ use Test::KwikHaks;
 delete $ENV{ PERL_VERSION };
 
 my $madness = 'Module::FromPerlVer';
+my $verbose = $ENV{ VERBOSE };
 
 my $work_d  = eval { Test::KwikHaks::work_dir() }
 or BAIL_OUT "Failed create tmpdir: $@";

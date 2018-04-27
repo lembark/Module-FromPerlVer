@@ -1,6 +1,6 @@
-#######################################################################
-# housekeeping
-########################################################################
+
+# this is the minimum version guaranteed to work with
+# File::Copy and FindBin::libs;
 
 use 5.008;
 use strict;
@@ -8,85 +8,90 @@ use version;
 
 use ExtUtils::MakeMaker;
 
-########################################################################
-# package variables
-########################################################################
+my $version = 'v0.20.1';
 
-$\          = "\n";
+my $path    = 'lib/Module/FromPerlVer.pm';
+my $mm_v
+= version->parse( ExtUtils::MakeMaker->VERSION )->numify;
 
-my $module  = 'lib/Module/FromPerlVer.pm';
-my $version = '0.9.4'; 
-
-########################################################################
-# various things that may depend on the ExtUtils::MakeMaker version.
-# the main hash gets messy enough as it is, keep the logic for these
-# up here and just insert them into the write args, below.
-########################################################################
-
-my $mm_v    = ExtUtils::MakeMaker->VERSION;
-
-my @test_spec = 
+WriteMakefile
 (
-    test =>
+    NAME            => 'Module::FromPerlVer',
+    ABSTRACT_FROM   => $path,
+    VERSION         => version->parse( $version )->numify,
+    LICENSE         => 'perl',
+	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
+    PREREQ_PM       =>
     {
-        TESTS => 't/*.t t/*/*.t'
+        # fixes issue with parsing used to test
+        # filesystem.
+
+        'Cwd'
+        => version->parse( '3.73'  )->numify,
+
+        # contains uniq.
+
+        'List::Util'
+        => version->parse( '1.46' )->numify,
+
+        # standard distro, particular versions
+        # are unlikely to cause pain.
+
+		qw
+        (
+            version                 0.9918
+
+            Archive::Tar            0
+            Carp                    0
+            File::Basename          0
+            File::Find              0
+            File::Spec::Functions   0
+            FindBin                 0
+            List::Util              0
+            List::MoreUtils         0
+            Symbol                  0
+            Test::More              0
+            strict                  0
+            version                 0
+        )
     },
 
-);
-
-my @dist_spec =
-(
-# steps to execute prior to testing.
-#
-#    dist =>
-#    {
-#        # the local_repo.tar is *not* in the MANIFEST.
-#        # it is used here for validating the POD
-#        # telling people how to make a tarball.
-#
-#        PREOP =>
-#        q{ cd sandbox/ && /bin/tar cvf .git.tar .git },
-#    }
-);
-
-my @merge_spec
-= do
-{
-    if( $mm_v < 6.52 )
+    $mm_v < 6.046
+    ? ()
+    : do
     {
-        ()
-    }
-    else
-    {
-        my $web = 'https://github.com/lembark/Module-FromPerlVer';
-        my $url = $web . '.git';
-
-
-        META_MERGE => 
+        META_MERGE =>
         {
             'meta-spec' =>
             {
                 version => 2
             },
+
             dynamic_config => 1,
-            resources => 
+
+            test =>
             {
-                repository => 
-                {
-                    web  => $web, 
-                    url  => $url,
-                    type => 'git',
-                },
-                bugtracker => 
-                {
-                    web => 'https://rt.cpan.org/Dist/Display.html?Name=Module-FromPerlVer',
-                },
+                TESTS => 't/*.t t/*/*.t'
+            },
+
+            config_requires =>
+            {
+                qw
+                (
+                    strict  0
+                    version 0
+
+                    ExtUtils::MakeMaker 0
+                )
             },
 
             TEST_REQUIRES =>
             {
-                'Cwd'           => version->parse( 'v3.73' )->numify,
-                'List::Util'    => version->parse( 'v1.46' )->numify, 
+                'Cwd'
+                => version->parse( 'v3.73' )->numify,
+
+                'List::Util'
+                => version->parse( 'v1.46' )->numify,
                 qw
                 (
                     lib                     0
@@ -100,11 +105,9 @@ my @merge_spec
                     File::Spec::Functions   0
                     File::Temp              0
                     FindBin                 0
-                    IPC::Open2              0
                     List::MoreUtils         0
                     Symbol                  0
                     Test::Deep              0
-                    Test::KwikHaks          0
                     Test::More              0
                 )
             },
@@ -115,61 +118,13 @@ my @merge_spec
                 (
                     strict
                     version
+
                     ExtUtils::MakeMaker
                 )
             },
         }
-    }
-};
-
-WriteMakefile
-(
-    NAME            => 'Module::FromPerlVer',
-    ABSTRACT_FROM   => $module,
-    VERSION         => version->parse( $version )->numify,
-    AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
-    LICENSE         => 'perl',
-    PREREQ_PM       =>
-    {
-        # standard distro, particular versions 
-        # are unlikely to cause pain.
-        #
-        # L::U 1.44 has uniq, 1.29 has pairs,
-        # 1.50 is current at time of writing.
-
-        # https://rt.cpan.org/Public/Bug/Display.html?id=125104 
-        # File::Copy::Recursive   0
-
-		qw
-        (
-            version                 0.9918
-            Cwd                     3.73
-            List::Util              1.5
-            File::Copy::Recursive::Reduced  0.002
-
-            Archive::Tar            0
-            Carp                    0
-            File::Basename          0
-            File::Find              0
-            File::Spec::Functions   0
-            FindBin                 0
-            List::MoreUtils         0
-            NEXT                    0
-            Scalar::Util            0
-            Symbol                  0
-            Test::Deep              0
-            Test::More              0
-            lib                     0
-            parent                  0
-            strict                  0
-            version                 0
-            warnings                0
-        ),
     },
 
-    @dist_spec,
-    @test_spec,
-    @merge_spec,
 );
 
 __END__

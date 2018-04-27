@@ -1,11 +1,13 @@
 ########################################################################
 # test using module with no args (all defaults) for perl version values.
 ########################################################################
-
 use 5.008;
 use strict;
-use version;
-use lib qw( lib t/lib );
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
+
+use FindBin qw( $Bin );
+use lib qw( $Bin );
 
 use Test::More;
 use Test::Deep;
@@ -14,6 +16,7 @@ use File::Basename  qw( basename    );
 use File::Temp      qw( tempfile    );
 
 my $madness = 'Module::FromPerlVer';
+my $verbose = $ENV{ VERBOSE };
 
 SKIP:
 {

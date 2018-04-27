@@ -17,12 +17,12 @@ qw
     &catpath
 );
 
-use lib( "$Bin/../../lib", "$Bin/../lib" );
+use lib( "$Bin/../lib" );
 use Test::KwikHaks;
 
 my $madness = 'Module::FromPerlVer';
-my $vers_d  = 'version';
-my $work_d  = eval { Test::KwikHaks::lib_tmpdir }
+my $vers_d  = 't/version';
+my $work_d  = eval { Test::KwikHaks::work_dir }
 or BAIL_OUT "Failed create tmpdir: $@";
 
 *output     = Test::KwikHaks->can( 'output' );
@@ -40,31 +40,37 @@ local $ENV{ PERL_VERSION } = $perl_v;
 
 eval
 {
-    use_ok $madness, work_dir => $work_d;
+    use_ok $madness =>
+    dest_dir    => $work_d,
+    version_dir => $vers_d,
+    ;
 
     1
 }
 or BAIL_OUT "Use failed: $@";
 
-for my $prefix ( $madness->source_prefix )
+for my $found ( $madness->version_dir )
 {
-    is $prefix, $vers_d, "Source prefix: '$prefix' ($vers_d)";
+    is $found, $vers_d, "Source dir: '$found' ($vers_d)";
 }
 
-for my $found ( scalar $madness->source_files )
+for my $found ( scalar $madness->source_paths )
 {
+    note "Source files:\n", explain $found;
+
     @$found
     ? pass 'Found source files in version directory'
     : fail 'Missing source files for cleanup'
     ;
+}
 
-    note "Source files:\n", explain $found;
+for my $expect ( scalar $madness->dest_paths )
+{
+    note "Dest files:\n", explain $expect;
 
-    for my $item ( @$found )
+    for( @$expect )
     {
-        my $path    = catpath '', $work_d, $item;
-
-        ok -e $path , "Found: '$item' ($work_d)";
+        ok -e, "Found: '$_' ($work_d)";
     }
 }
 

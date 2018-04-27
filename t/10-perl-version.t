@@ -1,17 +1,27 @@
 use 5.008;
-use lib qw( lib t/lib );
+use strict;
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use Test::More;
 use Test::Deep;
 
-my $verbose     = $ENV{ VERBOSE_FROMPERLVER } || '';
+use FindBin qw( $Bin );
+use lib( "$Bin/../lib" );
+use Test::KwikHaks;
+
+delete $ENV{ PERL_VERSION };
 
 my $madness = 'Module::FromPerlVer';
+my $verbose = $ENV{ VERBOSE };
 
-use_ok $madness => qw( no_copy 1 )
+my $work_d  = eval { Test::KwikHaks::work_dir() }
+or BAIL_OUT "Failed create tmpdir: $@";
+
+use_ok $madness =>  ( no_copy => 1, dest_dir => $work_d )
 or BAIL_OUT "$madness is not usable.";
 
-my ( $filz, $dirz ) = $madness->source_files;
+my ( $filz, $dirz ) = $madness->dest_paths;
 
 my $exists
 = sub
@@ -39,14 +49,17 @@ my $exists
     : \@resultz
 };
 
-unlink @$filz;
+# cleanup prior to running in case prior
+# tests left cruft behind.
+
+$madness->cleanup();
 
 my $prior   = $exists->( 'Prior' );
 
 ok ! -e , "No pre-existing: '$_'"
 for @$filz;
 
-for my $found ( $madness->get_files )
+for my $found ( $madness->copy_source_dir )
 {
     my $expect  = 1 + @$filz + @$dirz;
 
@@ -61,6 +74,10 @@ for @copy;
 $madness->cleanup;
 
 my $after   = $exists->( 'After' );
+
+# after the cleanup the filesystem should look
+# as it did on the way in. any existing dir's 
+# will still be there but files should be gone.
 
 cmp_deeply $after, $prior, 'Cleanup';
 

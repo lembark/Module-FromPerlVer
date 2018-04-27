@@ -14,8 +14,8 @@ use File::Basename      qw( basename            );
 use File::Find          qw( finddepth           );
 use File::Temp          qw( tempfile tempdir    );
 use FindBin             qw( $Bin                );
-use List::Util          qw( pairmap             );
-use List::MoreUtils     qw( zip uniq            );
+use List::Util          qw( pairmap uniq        );
+use List::MoreUtils     qw( zip                 );
 use Symbol              qw( qualify_to_ref      );
 
 use File::Spec::Functions
@@ -25,6 +25,7 @@ qw
     &splitdir
     &catpath
     &catdir
+    &abs2rel
 );
 
 ########################################################################
@@ -54,6 +55,8 @@ my $output_fh
 : $out_fh
 ;
 
+mkdir_if( search_bin( 't' ),  'sandbox' );
+
 ########################################################################
 # exported utilities
 ########################################################################
@@ -64,11 +67,11 @@ sub format
     {
         my $head    = shift;
 
-        join "\n#  " => "# $head:", @_
+        join "\n#  " => '', "$head:", @_
     }
     elsif( @_ )
     {
-        "# $_[0]";
+        "\n# $_[0]";
     }
     else
     {
@@ -78,11 +81,10 @@ sub format
 
 sub output
 {
-    local $\    = "\n";
-
     my $output  = &format;
 
     print $output_fh $output;
+    print "\n";
 
     return
 }
@@ -155,7 +157,7 @@ sub search_bin
         -e $path
         or next;
 
-        output( "Test $base: '$path'." );
+        output( "Search: '$base' ($path)" );
 
         return $path
     }
@@ -171,7 +173,6 @@ for
 (
     [ sandbox_path  => 'sandbox'            ],
     [ version_path  => 'version'            ],
-    [ tball_path    => 'sandbox/git.tar'    ],
 )
 {
     my ( $name, $rel_path ) = @$_;
@@ -198,7 +199,12 @@ sub write_version_file
         if
         (
             my ( $fh, $path ) 
-            = tempfile 'perl_version.XXXX'
+            = tempfile 
+            (
+                'perl_version.XXXX' =>
+                DIR     => sandbox_path(),
+                UNLINK  => 1,
+            )
         )
         {
             print $fh "$use $perl_v;\n"
@@ -207,7 +213,7 @@ sub write_version_file
             close $fh
             or die "Failed close: '$path', $!\n";
 
-            $path
+            abs2rel $path, getcwd
         }
         else
         {
@@ -226,7 +232,7 @@ sub mkdir_if
 {
     my $path = catdir @_;
 
-    output( "mkdir_if: '$path'" );
+#    output( "mkdir_if: '$path'" );
 
     -d $path            ? output( "Existing: '$path'." )
     : mkdir $path, 0777 ? output( "Created:  '$path'." )
@@ -272,7 +278,7 @@ sub generate_versions
         %d.%03d_%03d
     );
 
-    # lexical sort works.
+    # cartesian product of formats and versions
 
     my @v_stringz
     = uniq
@@ -300,41 +306,15 @@ sub generate_versions
     : \@v_stringz
 }
 
-sub sandbox_tmpdir
+sub work_dir
 {
-    my $tball   = tball_path();
-    my $sand_d  = sandbox_path();
+    # put all of the scratch dir's under a single sandbox
+    # filesystem to simplify cleanup.
+
+    my $t_d     = search_bin 't';
+    my $sand_d  = mkdir_if $t_d, 'sandbox';
     my $tmpl    = basename $0 . '-XXXX';
-
-    # alive at this point => paths are usable.
-
-    my $sand_tmp
-    = tempdir
-    (
-        $tmpl =>
-        DIR     => $sand_d,
-        CLEANUP => 1,
-    )
-    or die "Failed create tmpdir: $!.\n";
-
-
-    output 'Workdir: ' . basename $sand_tmp;
-    output "Extract: '$tball'";
-
-    chdir $sand_tmp
-    or die "Failed chdir: '$sand_tmp', $!";
-
-    Archive::Tar->extract_archive( $tball );
-
-    $sand_tmp
-}
-
-sub lib_tmpdir
-{
-    my $sand_d  = sandbox_path();
-    my $tmpl    = basename $0 . '-XXXX';
-
-    # alive at this point => paths are usable.
+    my $cwd     = getcwd;
 
     my $work_tmp
     = tempdir
@@ -345,101 +325,15 @@ sub lib_tmpdir
     )
     or die "Failed create tmpdir: $!.\n";
 
+    index $work_tmp, $cwd
+    or
+    $work_tmp   = abs2rel $work_tmp, $cwd;
+
+    # alive at this point => paths are usable.
+
     output "Work dir: '$work_tmp'";
 
     $work_tmp
-}
-
-sub git_sanity
-{
-    my $cmd = join ' ' => 'git', @_;
-
-    chomp( my @output = qx{ $cmd 2>&1 } );
-
-    if( $? )
-    {
-        error "Non-zero exit: '$cmd'", @output;
-        die "$cmd, $?\n";
-    }
-    elsif( @output )
-    {
-        output "$cmd", @output;
-    }
-    else
-    {
-        output "Zero exit, empty output from '$cmd'.";
-        return
-    }
-
-    scalar @output
-}
-
-sub verify_git_env
-{
-    eval
-    {
-        test_git_version
-    }
-    or die "Git not available ($@)\n";
-
-    my $sandbox 
-    = eval
-    {
-        sandbox_tmpdir
-    }
-    or do
-    {
-        error "No tempdir: $@";
-        return
-    };
-
-    eval
-    {
-        # checkout can reasonably get no output;
-        # tag and status must return something.
-
-        git_sanity qw( tag -l           ) or die "No tags.\n";
-        git_sanity qw( checkout HEAD    );
-        git_sanity qw( status .         ) or die "No status.\n";
-    }
-    or do
-    {
-        error $@;
-        return
-    };
-
-    # survival idicates success.
-    # caller gets back the test-specific sandbox dir.
-
-    $sandbox
-}
-
-sub verify_git_branch
-{
-$DB::single = 1;
-
-    my ( $prefix, $perl_v )  = @_;
-
-    chomp( my $found = ( qx{ git branch } )[0] );
-
-    0 <= index( $found, $prefix ),
-    or
-    die "No prefix: '$prefix' in '$found'.\n";
-
-    my $v_rx    = qr{ $prefix (v?[\d._]+) \b }x;
-
-    my ( $tag_v ) = $found =~ $v_rx
-    or die "No verion: '$found'\n";
-
-    my $i   = version->parse( $tag_v  )->numify;
-    my $j   = version->parse( $perl_v )->numify;
-
-    output "Tag ($i) <=> Perl ($j)";
-
-    $i <= $j
-    or die "Invalid tag version: '$i' > '$j'";
-
-    $tag_v
 }
 
 1

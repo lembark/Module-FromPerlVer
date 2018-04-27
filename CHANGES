@@ -1,4 +1,8 @@
---  v0.11   Tue Apr 24 17:34:45 CDT 2018
+-   v1.0    Thu Apr 26 22:45:15 CDT 2018
+
+    Bump version.
+
+-   v0.11   Tue Apr 24 17:34:45 CDT 2018
 
     Add back file-based tests for a variety of version 
     strings.
@@ -9,14 +13,14 @@
 
     Removed anything git-ish from the module & tests.
 
---  v0.10  Sun Apr 22 19:08:47 CDT 2018
+-   v0.10  Sun Apr 22 19:08:47 CDT 2018
 
     There is simply no way to get a consistent shell interface to 
     git across different platforms; every fix for one breaks another.
     Going back to the original approach of supporting only the 
     perl-version dir's, which has reliably worked throughout.
 
---  v0.0.1  Sun Feb 18 14:19:59 CST 2018
+-   v0.0.1  Sun Feb 18 14:19:59 CST 2018
 
     Initial kwikhak... ah... er... "relase", yes,
     that's the word release.

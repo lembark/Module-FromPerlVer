@@ -14,8 +14,8 @@ use File::Basename      qw( basename            );
 use File::Find          qw( finddepth           );
 use File::Temp          qw( tempfile tempdir    );
 use FindBin             qw( $Bin                );
-use List::Util          qw( pairmap             );
-use List::MoreUtils     qw( zip uniq            );
+use List::Util          qw( pairmap uniq        );
+use List::MoreUtils     qw( zip                 );
 use Symbol              qw( qualify_to_ref      );
 
 use File::Spec::Functions
@@ -278,7 +278,7 @@ sub generate_versions
         %d.%03d_%03d
     );
 
-    # lexical sort works.
+    # cartesian product of formats and versions
 
     my @v_stringz
     = uniq

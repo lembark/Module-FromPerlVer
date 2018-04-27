@@ -6,7 +6,7 @@
 # File::Copy::Recursive & friends -- yeah, ancient.
 
 package Module::FromPerlVer;
-use 5.006;
+use 5.008;
 use strict;
 use version;
 

@@ -5,7 +5,7 @@
 use 5.008;
 use strict;
 
-my $vers    = version->parse( 'v1.0.0' )->numify;
+my $version = version->parse( 'v0.20.1' )->numify;
 
 use ExtUtils::MakeMaker;
 
@@ -69,7 +69,7 @@ WriteMakefile
 (
     NAME            => 'Module::FromPerlVer',
     ABSTRACT_FROM   => $path,
-    VERSION         => $vers,
+    VERSION         => $version,
     LICENSE         => 'perl',
 	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
     PREREQ_PM       =>

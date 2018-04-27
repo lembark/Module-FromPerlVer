@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -v;
-
 pushd "$(dirname $0)/../..";
 
 init=(
@@ -40,15 +38,7 @@ git commit -m'empty directory';
 
 tar cf .git.tar .git;
 
-# push fake sandbox into module's git.
-# .gitignore avoids issues with
-# submodule.
-
 rm -rf .git;
-
-cd 
-git add sandbox;
-git commit -m'minimal sandbox for t/?1-*';
 
 exit 0;
 

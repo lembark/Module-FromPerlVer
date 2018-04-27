@@ -8,7 +8,7 @@ use File::Find  qw( find    );
 for my $glob ( "t/bin/??-make-*" )
 {
     local $ENV{ VERBOSE_FROMPERLVER } = '';
-#    local *STDOUT   = *STDERR;
+    local *STDOUT   = *STDERR;
     local $,        = "\n";
 
     print "Searching for setup: '$glob'\n";

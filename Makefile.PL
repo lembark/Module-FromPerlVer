@@ -30,7 +30,8 @@ my @test_spec =
     test =>
     {
         TESTS => 't/*.t t/*/*.t'
-    }
+    },
+
 );
 
 my @dist_spec =
@@ -51,7 +52,7 @@ my @dist_spec =
 my @merge_spec
 = do
 {
-    if( $mm_v < 6.46 )
+    if( $mm_v < 6.52 )
     {
         ()
     }
@@ -81,6 +82,42 @@ my @merge_spec
                     web => 'https://rt.cpan.org/Dist/Display.html?Name=Module-FromPerlVer',
                 },
             },
+
+            TEST_REQUIRES =>
+            {
+                'Cwd'           => version->parse( 'v3.73' )->numify,
+                'List::Util'    => version->parse( 'v1.46' )->numify, 
+                qw
+                (
+                    lib                     0
+                    strict                  0
+                    version                 0
+                    warnings                0
+
+                    Archive::Tar            0
+                    File::Basename          0
+                    File::Find              0
+                    File::Spec::Functions   0
+                    File::Temp              0
+                    FindBin                 0
+                    IPC::Open2              0
+                    List::MoreUtils         0
+                    Symbol                  0
+                    Test::Deep              0
+                    Test::KwikHaks          0
+                    Test::More              0
+                )
+            },
+
+            CONFIGURE_REQUIRES =>
+            {
+                qw
+                (
+                    strict
+                    version
+                    ExtUtils::MakeMaker
+                )
+            },
         }
     }
 };
@@ -100,16 +137,19 @@ WriteMakefile
         # L::U 1.44 has uniq, 1.29 has pairs,
         # 1.50 is current at time of writing.
 
+        # https://rt.cpan.org/Public/Bug/Display.html?id=125104 
+        # File::Copy::Recursive   0
+
 		qw
         (
             version                 0.9918
             Cwd                     3.73
-            List::Util              1.50
+            List::Util              1.5
+            File::Copy::Recursive::Reduced  0.002
 
             Archive::Tar            0
             Carp                    0
             File::Basename          0
-            File::Copy::Recursive   0
             File::Find              0
             File::Spec::Functions   0
             FindBin                 0

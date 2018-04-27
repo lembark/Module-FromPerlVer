@@ -27,7 +27,7 @@ or BAIL_OUT "Failed create tmpdir: $@";
 
 *output     = Test::KwikHaks->can( 'output' );
 
-output();
+output( "\n" );
 output( "Test sandbox: '$vers_d'" );
 my ( $base, $perl_v )  
 = eval

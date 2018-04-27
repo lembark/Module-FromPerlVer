@@ -80,7 +80,7 @@ for my $path ( @testz )
 
     for my $perl_v ( $gv->() )
     {
-        my $link    = "$base-$perl_v.t";
+        my $link    = "./$base-$perl_v.t";
 
         output( "Symlink: $link" );
 

@@ -35,16 +35,12 @@ my $madness = 'Module::FromPerlVer';
 
 my $wv      = Test::KwikHaks->can( 'write_version_file' );
 
-*output     = Test::KwikHaks->can( 'output' );
-
 my $work_d  = eval { Test::KwikHaks::work_dir }
 or BAIL_OUT "Failed create tmpdir: $@";
 
 ########################################################################
 # test reading version from "use" or "no".
 ########################################################################
-
-output( 'foobar' );
 
 delete $ENV{ PERL_VERSION };
 

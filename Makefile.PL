@@ -58,6 +58,11 @@ WriteMakefile
         )
     },
 
+    test =>
+    {
+        TESTS => 't/*.t t/dynamic/*.t'
+    },
+
     $mm_v < 6.046
     ? ()
     : do

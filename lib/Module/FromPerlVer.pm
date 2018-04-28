@@ -189,7 +189,10 @@ my @handlerz =
         or die "Botchd version_dir: '$path' is empty directory.\n";
 
         *{ qualify_to_ref 'version_dir' }
-        = sub { $path };
+        = sub
+        {
+            $path
+        };
 
         print "# Version directory: '$path'\n";
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.24;
+use v5.26;
 use lib 't/lib';
 
 use File::Find  qw( find    );
@@ -88,31 +88,20 @@ README
 CHANGES
 Makefile.PL
 lib/Module/FromPerlVer.pm
-lib/Module/FromPerlVer/Git.pm
-lib/Module/FromPerlVer/Dir.pm
-lib/Module/FromPerlVer/Extract.pm
-lib/Module/FromPerlVer/Util.pm
-
-# tarball to generate the test sandbox.
-
-sandbox/.git.tar
 
 # fixed tests
 
 t/00-usable.t
-t/01-default-args.t
-t/10-dir-defaults-no_copy.t
-t/11-use_dir.t
-t/12-dir-default-use.t
+t/10-perl-version.t
+t/11-env-version.t
+t/12-path-version.t
 t/13-reject-bogus-no-5.0.t
 
 # root of dynamic tests
 
-t/bin/20-file-defaults_t
-t/bin/21-git-local-defaults_t
-t/bin/30-file-version-from_t
-t/bin/31-git-local-version-from_t
-
 t/lib/Test/KwikHaks.pm
+
+t/bin/20-file-defaults_t
+t/bin/30-file-version-from_t
 
 # dynamic files

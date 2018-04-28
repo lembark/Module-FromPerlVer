@@ -16,7 +16,7 @@ my $mm_v
 my @merge_spec
 = do
 {
-    if( $mm_v < 6.046 )
+    if( $mm_v < 6.052 )
     {
         ()
     }
@@ -24,22 +24,25 @@ my @merge_spec
     {
         META_MERGE => 
         {
-#            'meta-spec' =>
-#            {
-#                version => 2
-#            },
+            'meta-spec' =>
+            {
+                version => 2
+            },
 
             dynamic_config => 1,
 
-            config_requires =>
+            CONFIGURE_REQUIRES =>
             {
                 qw
                 (
+                    strict  0
                     version 0
+
+                    ExtUtils::MakeMaker
                 )
             },
 
-            test_requires =>
+            TEST_REQUIRES =>
             {
                 Cwd => version->parse( '3.73'  )->numify,
                 qw
@@ -61,7 +64,6 @@ my @merge_spec
                     Test::More              0
                 )
             },
-
         }
     }
 };
@@ -105,14 +107,5 @@ WriteMakefile
 
     @merge_spec
 );
-
-for my $sandbox ( qw( ./t/sandbox ) )
-{
-    -d $sandbox
-    or
-    mkdir $sandbox, 0770
-    or
-    die "Failed mkdir: '$sandbox', $!\n";
-}
 
 __END__

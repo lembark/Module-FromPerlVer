@@ -13,3 +13,5 @@ Bar*
 perl_version.*
 MANIFEST
 sandbox*
+etc
+pod

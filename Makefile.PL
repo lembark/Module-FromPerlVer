@@ -6,6 +6,8 @@ use 5.008;
 use strict;
 use version;
 
+my $version = version->parse( 'v0.20.1' )->numify;
+
 use ExtUtils::MakeMaker;
 
 my $version = 'v0.20.1';

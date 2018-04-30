@@ -1,8 +1,13 @@
--   v0.2.1  Fri Apr 27 18:47:30 CDT 2018
+-   v0.21.0 Mon Apr 30 15:14:58 CDT 2018
+
+    Repair Makefile.PL, version spec's lost in the 
+    regression at v0.20.
+
+-   v0.20.1  Fri Apr 27 18:47:30 CDT 2018
 
     Makefile.PL cleanups.
 
--   v0.2.0  Thu Apr 26 22:45:15 CDT 2018
+-   v0.20.0  Thu Apr 26 22:45:15 CDT 2018
 
     Bump version.
 

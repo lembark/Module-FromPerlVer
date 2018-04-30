@@ -5,13 +5,22 @@
 use 5.008;
 use strict;
 
-my $version = version->parse( 'v0.2.1' )->numify;
+my $version = version->parse( 'v0.21.0' )->numify;
 
 use ExtUtils::MakeMaker;
 
 my $path    = 'lib/Module/FromPerlVer.pm';
 my $mm_v    
 = version->parse( ExtUtils::MakeMaker->VERSION )->numify;
+
+my $mod2ver
+= sub
+{
+    (
+        $_[0] => 
+        version->parse( $_[1] )->numify
+    )
+};
 
 my @merge_spec
 = do
@@ -44,7 +53,6 @@ my @merge_spec
 
             TEST_REQUIRES =>
             {
-                Cwd => version->parse( '3.73'  )->numify,
                 qw
                 (
                     lib     0
@@ -58,11 +66,18 @@ my @merge_spec
                     File::Temp              0
                     FindBin                 0
                     List::MoreUtils         0
-                    List::Util              0
                     Symbol                  0
                     Test::Deep              0
                     Test::More              0
-                )
+                ),
+                map
+                {
+                    $_->[0] => version->parse( $_->[1] )->numify,
+                }
+                (
+                    [ qw( Cwd           3.73 ) ],
+                    [ qw( List::Util    1.46 ) ],
+                );
             },
         }
     }
@@ -77,26 +92,25 @@ WriteMakefile
 	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
     PREREQ_PM       =>
     {
-        # fixes issue with parsing used to test
-        # filesystem.
-
-        Cwd => version->parse( '3.73'  )->numify,
-
-        # standard distro, particular versions 
-        # are unlikely to cause pain.
-
 		qw
         (
             File::Basename          0
-            File::Copy::Recursive   0
             File::Find              0
             File::Spec::Functions   0
             FindBin                 0
-            List::Util              0
             Symbol                  0
             Test::More              0
             strict                  0
             version                 0
+        ),
+        map
+        {
+            $mod2ver->( @$_ )
+        }
+        (
+            [ qw( Cwd 3.73                                  ) ],
+            [ qw( List::Util                        1.46    ) ],
+            [ qw( File::Copy::Recursive::Reduced    0.2     ) ],
         )
     },
 

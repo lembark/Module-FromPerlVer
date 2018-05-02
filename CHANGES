@@ -1,3 +1,11 @@
+-   v0.22.0 Wed May  2 12:16:00 CDT 2018
+
+    Break up find call into separate blocks to find out why
+    5.20 blows up with it; 5.26 is entirely happy.
+
+    File::Copy::Recursive may still have problems; revert to 
+    File::Copy::Recursive::Reduced.
+
 -   v0.21.0 Mon Apr 30 15:14:58 CDT 2018
 
     Repair Makefile.PL, version spec's lost in the 

@@ -5,7 +5,7 @@
 use 5.008;
 use strict;
 
-my $version = version->parse( 'v0.21.0' )->numify;
+my $version = version->parse( 'v0.22.0' )->numify;
 
 use ExtUtils::MakeMaker;
 
@@ -16,10 +16,16 @@ my $mm_v
 my $mod2ver
 = sub
 {
-    (
-        $_[0] => 
-        version->parse( $_[1] )->numify
-    )
+$DB::single = 1;
+
+    map
+    {
+        (
+            $_->[0] => 
+            version->parse( $_->[1] )->numify
+        )
+    }
+    @_
 };
 
 my @merge_spec
@@ -70,14 +76,12 @@ my @merge_spec
                     Test::Deep              0
                     Test::More              0
                 ),
-                map
-                {
-                    $_->[0] => version->parse( $_->[1] )->numify,
-                }
+                $mod2ver->
                 (
-                    [ qw( Cwd           3.73 ) ],
-                    [ qw( List::Util    1.46 ) ],
-                );
+                    [ qw( Cwd                               v3.73.0 ) ],
+                    [ qw( List::Util                        v1.46.0 ) ],
+                    [ qw( File::Copy::Recursive::Reduced    v0.2.0  ) ],
+                )
             },
         }
     }
@@ -103,14 +107,11 @@ WriteMakefile
             strict                  0
             version                 0
         ),
-        map
-        {
-            $mod2ver->( @$_ )
-        }
+        $mod2ver->
         (
-            [ qw( Cwd 3.73                                  ) ],
-            [ qw( List::Util                        1.46    ) ],
-            [ qw( File::Copy::Recursive::Reduced    0.2     ) ],
+            [ qw( Cwd                               v3.73.0 ) ],
+            [ qw( List::Util                        v1.46.0 ) ],
+            [ qw( File::Copy::Recursive::Reduced    v0.2.0  ) ],
         )
     },
 

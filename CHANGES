@@ -1,3 +1,9 @@
+-   v0.22.1 Fri May  4 21:05:12 UTC 2018
+
+    Change version dir test to simply existing with matching
+    basename to avoid issues with volume and path manglement
+    on Windows.
+
 -   v0.22.0 Wed May  2 12:16:00 CDT 2018
 
     Break up find call into separate blocks to find out why

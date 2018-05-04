@@ -12,18 +12,12 @@ use version;
 
 use Cwd                     qw( getcwd          );
 use File::Basename          qw( basename        );
-#use File::Copy::Recursive   qw( dircopy         );
+use File::Copy::Recursive   qw( dircopy         );
 use File::Find              qw( find            );
 use File::Spec::Functions   qw( &catpath        );
 use FindBin                 qw( $Bin            );
 use List::Util              qw( first reduce    );
 use Symbol                  qw( qualify_to_ref  );
-
-# onetime hak to deal with issues in File::Copy::Recursive.
-# will eventually be removed with File::Copy::Recursive, above
-# used.
-
-use File::Copy::Recursive::Reduced   qw( dircopy );
 
 use File::Spec::Functions
 qw
@@ -195,10 +189,7 @@ my @handlerz =
         or die "Botchd version_dir: '$path' is empty directory.\n";
 
         *{ qualify_to_ref 'version_dir' }
-        = sub
-        {
-            $path
-        };
+        = sub { $path };
 
         print "# Version directory: '$path'\n";
 
@@ -309,8 +300,8 @@ my @handlerz =
 
         my $n           = length $source_d;
 
-        my $wanted
-        = sub
+        find
+        sub
         {
             my $path    = $File::Find::name;
 
@@ -329,9 +320,8 @@ my @handlerz =
             my $sub_d   = abs2rel $dir, $source_d;
 
             push @{ $pathz[ $is_dir ] }, catpath $vol, $sub_d, $base;
-        };
-
-        find $wanted, $source_d;
+        },
+        $source_d;
 
         # deal with a set of empty dirs.
 

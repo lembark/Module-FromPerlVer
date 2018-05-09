@@ -5,7 +5,7 @@
 use 5.008;
 use strict;
 
-my $version = version->parse( 'v0.22.0' )->numify;
+my $version = version->parse( 'v0.3.0' )->numify;
 
 use ExtUtils::MakeMaker;
 
@@ -16,8 +16,6 @@ my $mm_v
 my $mod2ver
 = sub
 {
-$DB::single = 1;
-
     map
     {
         (

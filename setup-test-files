@@ -57,8 +57,7 @@ for my $path
 (
     qw
     (
-        version
-        sandbox/.git
+        t/version
         t/dynamic
     )
 )

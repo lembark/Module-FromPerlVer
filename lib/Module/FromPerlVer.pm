@@ -12,7 +12,6 @@ use version;
 
 use Cwd                     qw( getcwd          );
 use File::Basename          qw( basename        );
-#use File::Copy::Recursive   qw( dircopy         );
 use File::Find              qw( find            );
 use File::Spec::Functions   qw( &catpath        );
 use FindBin                 qw( $Bin            );
@@ -40,7 +39,7 @@ qw
 # package variables & sanity checks
 ########################################################################
 
-our $VERSION    = version->parse( 'v0.2.0' )->numify;
+our $VERSION    = version->parse( 'v0.3.0' )->numify;
 
 my $default_d   = 'version';
 

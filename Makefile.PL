@@ -80,7 +80,7 @@ my @merge_spec
                 (
                     [ qw( Cwd                               v3.73.0 ) ],
                     [ qw( List::Util                        v1.46.0 ) ],
-                    [ qw( File::Copy::Recursive::Reduced    v0.2.0  ) ],
+                    [ qw( File::Copy::Recursive::Reduced    v0.6.0  ) ],
                 )
             },
         }
@@ -111,7 +111,7 @@ WriteMakefile
         (
             [ qw( Cwd                               v3.73.0 ) ],
             [ qw( List::Util                        v1.46.0 ) ],
-            [ qw( File::Copy::Recursive::Reduced    v0.2.0  ) ],
+            [ qw( File::Copy::Recursive::Reduced    v0.6.0  ) ],
         )
     },
 

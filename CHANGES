@@ -1,3 +1,18 @@
+-   v0.3.0  Wed May  9 09:11:35 CDT 2018
+
+    Bump version number to try and find out why this fails for
+    lack of a module that isn't required. Failure notices call
+    out File::Copy::Recursive, which is not used in the Makefile.PL,
+    module, or test code. File::Copy::Recursive is not installed 
+    here and the tests all pass... but the tests fail for lack of
+    it on the smoke systems. Only thing I can figure is that they
+    are testing a stale copy of the module. Hopefully bumping the
+    version will solve the issue.
+
+    Add test to use File::Find to walk down the tree grep-ing
+    "File::Copy::Recursive" and dumping the result along with 
+    the module version to try and see what is going on.
+
 -   v0.22.0 Wed May  2 12:16:00 CDT 2018
 
     Break up find call into separate blocks to find out why

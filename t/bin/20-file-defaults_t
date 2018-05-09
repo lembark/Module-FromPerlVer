@@ -47,7 +47,17 @@ or BAIL_OUT "Use failed: $@";
 
 for my $found ( $madness->version_dir )
 {
-    is $found, $vers_d, "Source dir: '$found' ($vers_d)";
+    # no telling what the path looks 
+    # like on Windows. existing path
+    # with a matching basename is
+    # probably the best we can do.
+
+    ok -e $found, "Existing directory: '$found'";
+
+    my $base0   = basename $vers_d;
+    my $base1   = basename $found;
+
+    is $base1, $base0, "Source dir is: '$found' ($base)";
 }
 
 for my $found ( scalar $madness->source_paths )

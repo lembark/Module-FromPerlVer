@@ -80,7 +80,6 @@ else
 }
 
 # this is not a module
-$DB::single = 1;
 0
 __DATA__
 MANIFEST

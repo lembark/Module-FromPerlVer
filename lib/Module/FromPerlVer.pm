@@ -12,12 +12,13 @@ use version;
 
 use Cwd                     qw( getcwd          );
 use File::Basename          qw( basename        );
-use File::Copy::Recursive   qw( dircopy         );
 use File::Find              qw( find            );
 use File::Spec::Functions   qw( &catpath        );
 use FindBin                 qw( $Bin            );
 use List::Util              qw( first reduce    );
 use Symbol                  qw( qualify_to_ref  );
+
+use File::Copy::Recursive::Reduced  qw( dircopy );
 
 use File::Spec::Functions
 qw

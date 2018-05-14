@@ -1,4 +1,4 @@
--   v0.3.0 Mon May 14 16:12:58 UTC 2018
+-   v0.3.1 Mon May 14 16:12:58 UTC 2018
 
     Odd, TEST_REQUIRES includes Test::Deep:
 
@@ -58,8 +58,21 @@
     additional tests for "require_ok" into t/00*.t.
 
 
+-   v0.3.0  Wed May  9 09:11:35 CDT 2018
 
+    Bump version number to try and find out why this fails for
+    lack of a module that isn't required. Failure notices call
+    out File::Copy::Recursive, which is not used in the Makefile.PL,
+    module, or test code. File::Copy::Recursive is not installed 
+    here and the tests all pass... but the tests fail for lack of
+    it on the smoke systems. Only thing I can figure is that they
+    are testing a stale copy of the module. Hopefully bumping the
+    version will solve the issue.
 
+    Add test to use File::Find to walk down the tree grep-ing
+    "File::Copy::Recursive" and dumping the result along with 
+    the module version to try and see what is going on.
+>>>>>>> e23d2607524f4f5353ebb75870f9af8cf1b05452
 
 -   v0.22.1 Fri May  4 21:05:12 UTC 2018
 

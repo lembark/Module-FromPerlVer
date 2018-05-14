@@ -5,7 +5,7 @@
 use 5.008;
 use strict;
 
-my $version = version->parse( 'v0.23.0' )->numify;
+my $version = version->parse( 'v0.3.1' )->numify;
 
 use ExtUtils::MakeMaker;
 
@@ -16,8 +16,6 @@ my $mm_v
 my $mod2ver
 = sub
 {
-$DB::single = 1;
-
     map
     {
         (
@@ -114,7 +112,7 @@ WriteMakefile
         (
             [ qw( Cwd                               v3.73.0 ) ],
             [ qw( List::Util                        v1.46.0 ) ],
-            [ qw( File::Copy::Recursive::Reduced    v0.2.0  ) ],
+            [ qw( File::Copy::Recursive::Reduced    v0.6.0  ) ],
         )
     },
 

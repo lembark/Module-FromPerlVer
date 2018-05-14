@@ -53,7 +53,18 @@ my $wanted
     push @found, $File::Find::name
 };
 
+<<<<<<< HEAD
 for my $path ( glob 't/{version,dynamic}' )
+=======
+for my $path
+(
+    qw
+    (
+        t/version
+        t/dynamic
+    )
+)
+>>>>>>> e23d2607524f4f5353ebb75870f9af8cf1b05452
 {
     find $wanted, $path;
 }

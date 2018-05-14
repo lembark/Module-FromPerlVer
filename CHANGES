@@ -1,8 +1,73 @@
+-   v0.3.0 Mon May 14 16:12:58 UTC 2018
+
+    Odd, TEST_REQUIRES includes Test::Deep:
+
+            TEST_REQUIRES =>
+            {
+                qw
+                (
+                    lib     0
+                    strict  0
+                    version 0
+
+                    Archive::Tar            0
+                    File::Basename          0
+                    File::Find              0
+                    File::Spec::Functions   0
+                    File::Temp              0
+                    FindBin                 0
+                    List::MoreUtils         0
+                    Symbol                  0
+        *           Test::Deep              0
+                    Test::More              0
+                ),
+                $mod2ver->
+                (
+                    [ qw( Cwd                               v3.73.0 ) ],
+                    [ qw( List::Util                        v1.46.0 ) ],
+                    [ qw( File::Copy::Recursive::Reduced    v0.6.0  ) ],
+                )
+            },
+
+    but this fails for lack of "Test::Deep" on a number of platforms.
+    The module is not used until testing, nothing blows up during
+    configuration.
+
+    The directive seems to be processed:
+
+        x_TEST_REQUIRES:
+          Archive::Tar: '0'
+          Cwd: '3.073000'
+          File::Basename: '0'
+          File::Copy::Recursive::Reduced: '0.002000'
+          File::Find: '0'
+          File::Spec::Functions: '0'
+          File::Temp: '0'
+          FindBin: '0'
+          List::MoreUtils: '0'
+          List::Util: '1.046000'
+          Symbol: '0'
+      *   Test::Deep: '0'
+          Test::More: '0'
+          lib: '0'
+          strict: '0'
+          version: '0'
+
+    Not sure what this means...
+    Hacking the Makefile.pl to include "test_requires", add a few
+    additional tests for "require_ok" into t/00*.t.
+
+
+
+
+
 -   v0.22.1 Fri May  4 21:05:12 UTC 2018
 
     Change version dir test to simply existing with matching
     basename to avoid issues with volume and path manglement
     on Windows.
+
+    Still no idea why pre-5.22 fails with compile error.
 
 -   v0.22.0 Wed May  2 12:16:00 CDT 2018
 

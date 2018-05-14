@@ -53,15 +53,7 @@ my $wanted
     push @found, $File::Find::name
 };
 
-for my $path
-(
-    qw
-    (
-        version
-        sandbox/.git
-        t/dynamic
-    )
-)
+for my $path ( glob 't/{version,dynamic}' )
 {
     find $wanted, $path;
 }

@@ -5,7 +5,7 @@
 use 5.008;
 use strict;
 
-my $version = version->parse( 'v0.22.0' )->numify;
+my $version = version->parse( 'v0.23.0' )->numify;
 
 use ExtUtils::MakeMaker;
 
@@ -28,7 +28,7 @@ $DB::single = 1;
     @_
 };
 
-my @merge_spec
+my %merge_spec
 = do
 {
     if( $mm_v < 6.052 )
@@ -80,12 +80,15 @@ my @merge_spec
                 (
                     [ qw( Cwd                               v3.73.0 ) ],
                     [ qw( List::Util                        v1.46.0 ) ],
-                    [ qw( File::Copy::Recursive::Reduced    v0.2.0  ) ],
+                    [ qw( File::Copy::Recursive::Reduced    v0.6.0  ) ],
                 )
             },
         }
     }
 };
+
+$merge_spec{ META_MERGE }{ lc $_ } = $merge_spec{ META_MERGE }{ $_ } 
+for qw( CONFIGURE_REQUIRES TEST_REQUIRES );
 
 WriteMakefile
 (
@@ -120,7 +123,7 @@ WriteMakefile
         TESTS => 't/*.t t/dynamic/*.t'
     },
 
-    @merge_spec
+    %merge_spec
 );
 
 __END__
